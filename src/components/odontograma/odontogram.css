@@ -1,0 +1,209 @@
+/* Estilos para el odontograma personalizado */
+.odontogram-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.custom-odontogram {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.tooth-container {
+  transition: transform 0.2s ease-in-out;
+}
+
+.tooth-container:hover {
+  transform: scale(1.05);
+}
+
+.tooth {
+  background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tooth:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+}
+
+.tooth.selected {
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-color: #3b82f6;
+}
+
+.surface {
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.surface:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  border-color: #3b82f6;
+}
+
+/* Estados de los dientes */
+.tooth.bg-green-500 {
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+}
+
+.tooth.bg-red-500 {
+  background: linear-gradient(145deg, #ef4444, #dc2626);
+}
+
+.tooth.bg-blue-500 {
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+}
+
+.tooth.bg-yellow-500 {
+  background: linear-gradient(145deg, #eab308, #ca8a04);
+}
+
+.tooth.bg-purple-500 {
+  background: linear-gradient(145deg, #a855f7, #9333ea);
+}
+
+.tooth.bg-gray-500 {
+  background: linear-gradient(145deg, #6b7280, #4b5563);
+}
+
+.tooth.bg-black {
+  background: linear-gradient(145deg, #1f2937, #111827);
+  color: white;
+}
+
+.tooth.bg-orange-500 {
+  background: linear-gradient(145deg, #f97316, #ea580c);
+}
+
+.tooth.bg-indigo-500 {
+  background: linear-gradient(145deg, #6366f1, #4f46e5);
+}
+
+.tooth.bg-red-600 {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+}
+
+/* Superficies */
+.surface.bg-green-200 {
+  background: rgba(187, 247, 208, 0.8);
+}
+
+.surface.bg-red-200 {
+  background: rgba(254, 202, 202, 0.8);
+}
+
+.surface.bg-blue-200 {
+  background: rgba(191, 219, 254, 0.8);
+}
+
+.surface.bg-yellow-200 {
+  background: rgba(254, 240, 138, 0.8);
+}
+
+.surface.bg-purple-200 {
+  background: rgba(233, 213, 255, 0.8);
+}
+
+.surface.bg-gray-200 {
+  background: rgba(229, 231, 235, 0.8);
+}
+
+.surface.bg-orange-200 {
+  background: rgba(254, 215, 170, 0.8);
+}
+
+/* Animaciones */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.tooth-selected {
+  animation: pulse 1s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .tooth {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .tooth-container {
+    gap: 4px;
+  }
+  
+  .custom-odontogram {
+    padding: 10px;
+  }
+}
+
+/* Tooltip styles */
+.tooth-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  transform: translateX(-50%);
+  bottom: calc(100% + 5px);
+  left: 50%;
+}
+
+.tooth-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Grupo labels */
+.group-container {
+  margin: 0 20px;
+}
+
+.group-container .text-center {
+  font-weight: 600;
+  color: #1e40af;
+  letter-spacing: 0.025em;
+}
+
+/* Herramientas */
+.tool-button {
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.tool-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tool-button.active {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Loading states */
+.tooth-loading {
+  background: linear-gradient(90deg, #f3f4f6, #e5e7eb, #f3f4f6);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

@@ -4,11 +4,12 @@ import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import CuestionarioMedico from '@/components/cuestionario/CuestionarioMedico';
 import CuestionarioOdontologicoComponent from '@/components/cuestionario/CuestionarioOdontologico';
+import OdontogramViewer from '@/components/odontograma/OdontogramViewer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, FileText, Stethoscope, Activity } from 'lucide-react';
+import { ArrowLeft, FileText, Stethoscope, Activity, Smile } from 'lucide-react';
 import apiService from '@/services/api';
 import axios from 'axios';
 import type { 
@@ -28,6 +29,7 @@ const CuestionarioCompletePage: React.FC = () => {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string>('');
     const [historiaExistente, setHistoriaExistente] = useState<HistoriaClinica | null>(null);
+    const [odontograma, setOdontograma] = useState<any>(null);
     const [activeTab, setActiveTab] = useState('medico');
 
     useEffect(() => {
@@ -66,6 +68,11 @@ const CuestionarioCompletePage: React.FC = () => {
                         const odontologicoTransformado = transformarOdontologicoDesdeBackend(cuestionarioOdont);
                         console.log('Cuestionario odontológico transformado:', odontologicoTransformado);
                         historia.cuestionarioOdontologico = odontologicoTransformado;
+                    }
+                    
+                    // Cargar odontograma si existe
+                    if (historia.odontograma) {
+                        setOdontograma(historia.odontograma);
                     }
                     
                     setHistoriaExistente(historia);
@@ -374,6 +381,79 @@ const CuestionarioCompletePage: React.FC = () => {
         }
     };
 
+    const handleSaveOdontograma = async (odontogramData: any) => {
+        if (!paciente || !user) return;
+
+        setSaving(true);
+        setError('');
+
+        try {
+            const token = localStorage.getItem('token');
+            
+            if (historiaExistente) {
+                // Actualizar historia existente con odontograma
+                const response = await axios.patch(
+                    `http://localhost:3000/api/historias/${historiaExistente.id}`,
+                    {
+                        odontograma: odontogramData
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+                setHistoriaExistente(response.data);
+                setOdontograma(response.data.odontograma);
+            } else {
+                // Crear nueva historia con odontograma
+                const payload = {
+                    pacienteId: paciente.id!,
+                    cuestionario: {},
+                    cuestionarioOdontologico: {},
+                    odontograma: odontogramData
+                };
+
+                const response = await axios.post(
+                    'http://localhost:3000/api/historias',
+                    payload,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+                setHistoriaExistente(response.data);
+                setOdontograma(response.data.odontograma);
+            }
+
+            console.log('Odontograma guardado exitosamente');
+            
+        } catch (err: any) {
+            console.error('Error guardando odontograma:', err);
+            
+            let errorMessage = 'Error desconocido al guardar el odontograma';
+            
+            if (err.response?.data?.message) {
+                if (Array.isArray(err.response.data.message)) {
+                    errorMessage = err.response.data.message.join(', ');
+                } else {
+                    errorMessage = err.response.data.message;
+                }
+            } else if (err.response?.data?.error) {
+                errorMessage = err.response.data.error;
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+            
+            setError(`Error al guardar el odontograma: ${errorMessage}`);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (loading) {
         return (
             <DashboardLayout>
@@ -451,14 +531,18 @@ const CuestionarioCompletePage: React.FC = () => {
 
                 {/* Tabs para los cuestionarios */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
+                    <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="medico" className="flex items-center gap-2">
                             <Stethoscope className="h-4 w-4" />
                             Cuestionario Médico
                         </TabsTrigger>
                         <TabsTrigger value="odontologico" className="flex items-center gap-2">
                             <Activity className="h-4 w-4" />
-                            Cuestionario Odontológico
+                            Cuestionario Dental
+                        </TabsTrigger>
+                        <TabsTrigger value="odontograma" className="flex items-center gap-2">
+                            <Smile className="h-4 w-4" />
+                            Odontograma
                         </TabsTrigger>
                     </TabsList>
 
@@ -486,6 +570,15 @@ const CuestionarioCompletePage: React.FC = () => {
                                     : undefined
                             }
                             loading={saving}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="odontograma" className="mt-6">
+                        <OdontogramViewer
+                            historiaId={historiaExistente?.id?.toString() || 'nuevo'}
+                            readOnly={false}
+                            odontograma={odontograma}
+                            onSave={handleSaveOdontograma}
                         />
                     </TabsContent>
                 </Tabs>

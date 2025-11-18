@@ -132,11 +132,14 @@ const ToothComponent: React.FC<{
             {/* Diente visual */}
             <div
                 className={`
-                    tooth relative w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer
-                    ${isSelected ? 'ring-2 ring-blue-500' : ''}
+                    tooth relative w-12 h-12 border-2 rounded-lg cursor-pointer
+                    ${isSelected 
+                        ? 'selected border-blue-600 ring-4 ring-blue-300 ring-opacity-50 shadow-lg shadow-blue-200' 
+                        : 'border-gray-300'
+                    }
                     ${readOnly ? 'cursor-default' : 'hover:border-blue-400'}
                     ${getStatusColor(tooth.status)}
-                    transition-all duration-200
+                    transition-all duration-300 ease-in-out
                 `}
                 onClick={() => !readOnly && onClick(tooth)}
             >
@@ -181,6 +184,13 @@ const ToothComponent: React.FC<{
                 {/* Status general del diente */}
                 {tooth.status !== 'sano' && (
                     <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-white border border-gray-300 rounded-full flex items-center justify-center text-xs">
+                    </div>
+                )}
+                
+                {/* Indicador de selección */}
+                {isSelected && (
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-md z-10">
+                        {tooth.number}
                     </div>
                 )}
             </div>

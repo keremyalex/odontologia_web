@@ -30,6 +30,18 @@
   border-color: #3b82f6;
 }
 
+/* Estilos para diente seleccionado */
+.tooth.selected {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+  z-index: 10;
+  position: relative;
+}
+
+.tooth.selected:hover {
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+}
+
 .tooth.selected {
   box-shadow: 0 0 0 2px #3b82f6;
   border-color: #3b82f6;

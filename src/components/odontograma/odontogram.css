@@ -4,9 +4,10 @@
 }
 
 .custom-odontogram {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
+  width: 100%;
 }
 
 .tooth-container {
@@ -140,6 +141,21 @@
 }
 
 /* Responsive design */
+@media (max-width: 1200px) {
+  .tooth {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .group-container {
+    margin: 0 2px;
+  }
+  
+  .custom-odontogram {
+    padding: 8px;
+  }
+}
+
 @media (max-width: 768px) {
   .tooth {
     width: 32px !important;
@@ -147,11 +163,11 @@
   }
   
   .tooth-container {
-    gap: 4px;
+    gap: 2px;
   }
   
   .custom-odontogram {
-    padding: 10px;
+    padding: 5px;
   }
 }
 
@@ -183,7 +199,11 @@
 
 /* Grupo labels */
 .group-container {
-  margin: 0 20px;
+  margin: 0 4px;
+}
+
+.group-container .flex {
+  gap: 2px;
 }
 
 .group-container .text-center {

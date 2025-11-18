@@ -40,45 +40,49 @@ interface OdontogramViewerProps {
 // Función para crear dientes iniciales (todos sanos)
 const createInitialTeeth = (): Tooth[] => {
     const permanentTeeth = [
-        // Cuadrante Superior Derecho (Grupo 1) - De 1.8 a 1.1
+        // Grupo 1 - Molares y premolares superiores derechos (1.8 al 1.4)
         { id: 18, number: '1.8', position: 'Superior Derecho', group: 1 },
         { id: 17, number: '1.7', position: 'Superior Derecho', group: 1 },
         { id: 16, number: '1.6', position: 'Superior Derecho', group: 1 },
         { id: 15, number: '1.5', position: 'Superior Derecho', group: 1 },
         { id: 14, number: '1.4', position: 'Superior Derecho', group: 1 },
-        { id: 13, number: '1.3', position: 'Superior Derecho', group: 1 },
-        { id: 12, number: '1.2', position: 'Superior Derecho', group: 1 },
-        { id: 11, number: '1.1', position: 'Superior Derecho', group: 1 },
 
-        // Cuadrante Superior Izquierdo (Grupo 2) - De 2.1 a 2.8
+        // Grupo 2 - Incisivos y caninos superiores (1.3 al 2.3)
+        { id: 13, number: '1.3', position: 'Superior Derecho', group: 2 },
+        { id: 12, number: '1.2', position: 'Superior Derecho', group: 2 },
+        { id: 11, number: '1.1', position: 'Superior Derecho', group: 2 },
         { id: 21, number: '2.1', position: 'Superior Izquierdo', group: 2 },
         { id: 22, number: '2.2', position: 'Superior Izquierdo', group: 2 },
         { id: 23, number: '2.3', position: 'Superior Izquierdo', group: 2 },
-        { id: 24, number: '2.4', position: 'Superior Izquierdo', group: 2 },
-        { id: 25, number: '2.5', position: 'Superior Izquierdo', group: 2 },
-        { id: 26, number: '2.6', position: 'Superior Izquierdo', group: 2 },
-        { id: 27, number: '2.7', position: 'Superior Izquierdo', group: 2 },
-        { id: 28, number: '2.8', position: 'Superior Izquierdo', group: 2 },
 
-        // Cuadrante Inferior Izquierdo (Grupo 3) - De 3.1 a 3.8
-        { id: 31, number: '3.1', position: 'Inferior Izquierdo', group: 3 },
-        { id: 32, number: '3.2', position: 'Inferior Izquierdo', group: 3 },
-        { id: 33, number: '3.3', position: 'Inferior Izquierdo', group: 3 },
-        { id: 34, number: '3.4', position: 'Inferior Izquierdo', group: 3 },
-        { id: 35, number: '3.5', position: 'Inferior Izquierdo', group: 3 },
-        { id: 36, number: '3.6', position: 'Inferior Izquierdo', group: 3 },
-        { id: 37, number: '3.7', position: 'Inferior Izquierdo', group: 3 },
-        { id: 38, number: '3.8', position: 'Inferior Izquierdo', group: 3 },
+        // Grupo 3 - Premolares y molares superiores izquierdos (2.4 al 2.8)
+        { id: 24, number: '2.4', position: 'Superior Izquierdo', group: 3 },
+        { id: 25, number: '2.5', position: 'Superior Izquierdo', group: 3 },
+        { id: 26, number: '2.6', position: 'Superior Izquierdo', group: 3 },
+        { id: 27, number: '2.7', position: 'Superior Izquierdo', group: 3 },
+        { id: 28, number: '2.8', position: 'Superior Izquierdo', group: 3 },
 
-        // Cuadrante Inferior Derecho (Grupo 4) - De 4.8 a 4.1
+        // Grupo 4 - Molares y premolares inferiores derechos (4.8 al 4.4)
         { id: 48, number: '4.8', position: 'Inferior Derecho', group: 4 },
         { id: 47, number: '4.7', position: 'Inferior Derecho', group: 4 },
         { id: 46, number: '4.6', position: 'Inferior Derecho', group: 4 },
         { id: 45, number: '4.5', position: 'Inferior Derecho', group: 4 },
         { id: 44, number: '4.4', position: 'Inferior Derecho', group: 4 },
-        { id: 43, number: '4.3', position: 'Inferior Derecho', group: 4 },
-        { id: 42, number: '4.2', position: 'Inferior Derecho', group: 4 },
-        { id: 41, number: '4.1', position: 'Inferior Derecho', group: 4 }
+
+        // Grupo 5 - Incisivos y caninos inferiores (4.3 al 3.3)
+        { id: 43, number: '4.3', position: 'Inferior Derecho', group: 5 },
+        { id: 42, number: '4.2', position: 'Inferior Derecho', group: 5 },
+        { id: 41, number: '4.1', position: 'Inferior Derecho', group: 5 },
+        { id: 31, number: '3.1', position: 'Inferior Izquierdo', group: 5 },
+        { id: 32, number: '3.2', position: 'Inferior Izquierdo', group: 5 },
+        { id: 33, number: '3.3', position: 'Inferior Izquierdo', group: 5 },
+
+        // Grupo 6 - Premolares y molares inferiores izquierdos (3.4 al 3.8)
+        { id: 34, number: '3.4', position: 'Inferior Izquierdo', group: 6 },
+        { id: 35, number: '3.5', position: 'Inferior Izquierdo', group: 6 },
+        { id: 36, number: '3.6', position: 'Inferior Izquierdo', group: 6 },
+        { id: 37, number: '3.7', position: 'Inferior Izquierdo', group: 6 },
+        { id: 38, number: '3.8', position: 'Inferior Izquierdo', group: 6 }
     ];
 
     return permanentTeeth.map(tooth => ({
@@ -245,7 +249,7 @@ const ToothDetailPanel: React.FC<{
     };
 
     return (
-        <div className="bg-white border-l border-gray-200 w-80 p-4 flex flex-col h-full">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-80 p-4 flex flex-col h-full mr-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-2 border-b">
                 <div>
@@ -509,12 +513,12 @@ const CustomOdontogram: React.FC<{
     return (
         <div className="custom-odontogram">
             {/* Arcada Superior */}
-            <div className="upper-arch mb-8">
-                <div className="flex justify-between items-start">
-                    {/* Grupo 1 - Superior Derecho (1.8 a 1.1) */}
+            <div className="upper-arch mb-4">
+                <div className="flex justify-center items-start gap-2">
+                    {/* Grupo 1 - Molares superiores derechos */}
                     <div className="group-container">
                         <div className="text-center text-blue-600 font-medium mb-3">Grupo 1</div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                             {getTeethByGroup(1).map((tooth) => (
                                 <ToothComponent
                                     key={tooth.id}
@@ -527,11 +531,27 @@ const CustomOdontogram: React.FC<{
                         </div>
                     </div>
 
-                    {/* Grupo 2 - Superior Izquierdo (2.1 a 2.8) */}
+                    {/* Grupo 2 - Premolares e incisivos superiores derechos */}
                     <div className="group-container">
                         <div className="text-center text-blue-600 font-medium mb-3">Grupo 2</div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                             {getTeethByGroup(2).map(tooth => (
+                                <ToothComponent
+                                    key={tooth.id}
+                                    tooth={tooth}
+                                    isSelected={selectedTooth?.id === tooth.id}
+                                    readOnly={readOnly}
+                                    onClick={onToothClick}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Grupo 3 - Premolares e incisivos superiores izquierdos */}
+                    <div className="group-container">
+                        <div className="text-center text-blue-600 font-medium mb-3">Grupo 3</div>
+                        <div className="flex gap-1">
+                            {getTeethByGroup(3).map(tooth => (
                                 <ToothComponent
                                     key={tooth.id}
                                     tooth={tooth}
@@ -547,10 +567,10 @@ const CustomOdontogram: React.FC<{
 
             {/* Arcada Inferior */}
             <div className="lower-arch">
-                <div className="flex justify-between items-start">
-                    {/* Grupo 4 - Inferior Derecho (4.8 a 4.1) */}
+                <div className="flex justify-center items-start gap-2">
+                    {/* Grupo 4 - Molares y premolares inferiores derechos */}
                     <div className="group-container">
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                             {getTeethByGroup(4).map(tooth => (
                                 <ToothComponent
                                     key={tooth.id}
@@ -564,10 +584,10 @@ const CustomOdontogram: React.FC<{
                         <div className="text-center text-blue-600 font-medium mt-3">Grupo 4</div>
                     </div>
 
-                    {/* Grupo 3 - Inferior Izquierdo (3.1 a 3.8) */}
+                    {/* Grupo 5 - Incisivos y caninos inferiores */}
                     <div className="group-container">
-                        <div className="flex gap-2">
-                            {getTeethByGroup(3).map(tooth => (
+                        <div className="flex gap-1">
+                            {getTeethByGroup(5).map(tooth => (
                                 <ToothComponent
                                     key={tooth.id}
                                     tooth={tooth}
@@ -577,7 +597,23 @@ const CustomOdontogram: React.FC<{
                                 />
                             ))}
                         </div>
-                        <div className="text-center text-blue-600 font-medium mt-3">Grupo 3</div>
+                        <div className="text-center text-blue-600 font-medium mt-3">Grupo 5</div>
+                    </div>
+
+                    {/* Grupo 6 - Premolares y molares inferiores izquierdos */}
+                    <div className="group-container">
+                        <div className="flex gap-1">
+                            {getTeethByGroup(6).map(tooth => (
+                                <ToothComponent
+                                    key={tooth.id}
+                                    tooth={tooth}
+                                    isSelected={selectedTooth?.id === tooth.id}
+                                    readOnly={readOnly}
+                                    onClick={onToothClick}
+                                />
+                            ))}
+                        </div>
+                        <div className="text-center text-blue-600 font-medium mt-3">Grupo 6</div>
                     </div>
                 </div>
             </div>
@@ -713,7 +749,7 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
     };
 
     return (
-        <div className="odontogram-viewer space-y-6">
+        <div className="odontogram-viewer space-y-6 max-w-7xl mx-auto px-4">
             {/* Solo mostrar controles de guardado cuando no es solo lectura */}
             {!readOnly && (
                 <Card>
@@ -760,14 +796,14 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
             )}
 
             {/* Layout principal con odontograma y panel lateral */}
-            <div className="flex gap-6">
+            <div className="flex gap-4">
                 {/* Odontograma principal */}
-                <div className="flex-1">
+                <div className="flex-1 overflow-hidden">
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4">
                             <div className="odontogram-container bg-white">
                                 {/* Header */}
-                                <div className="flex justify-between items-center mb-6">
+                                <div className="flex justify-between items-center mb-4">
                                     <div className="text-sm text-gray-600">
                                         Sistema de numeración: FDI
                                     </div>
@@ -777,28 +813,22 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                                 </div>
 
                                 {/* Odontograma */}
-                                <CustomOdontogram
-                                    teeth={teeth}
-                                    selectedTooth={selectedTooth}
-                                    readOnly={readOnly}
-                                    onToothClick={handleToothClick}
-                                />
-
-                                {/* Mensaje informativo cuando no hay diente seleccionado */}
-                                {!selectedTooth && !readOnly && (
-                                    <div className="mt-8 text-center text-gray-500">
-                                        <p className="text-lg font-medium">Selecciona un diente</p>
-                                        <p className="text-sm">Haz clic en cualquier diente del odontograma para ver sus detalles y herramientas</p>
-                                    </div>
-                                )}
+                                <div className="w-full">
+                                    <CustomOdontogram
+                                        teeth={teeth}
+                                        selectedTooth={selectedTooth}
+                                        readOnly={readOnly}
+                                        onToothClick={handleToothClick}
+                                    />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Panel lateral - Solo aparece cuando hay un diente seleccionado */}
-                {selectedTooth && (
-                    <div className="w-80">
+                {/* Panel lateral - Siempre presente */}
+                <div className="w-80 min-w-80">
+                    {selectedTooth ? (
                         <ToothDetailPanel
                             tooth={selectedTooth}
                             readOnly={readOnly}
@@ -806,8 +836,15 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                             onSurfaceUpdate={handleSurfaceUpdate}
                             onClose={() => setSelectedTooth(null)}
                         />
-                    </div>
-                )}
+                    ) : (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg shadow-sm w-80 p-8 flex flex-col items-center justify-center h-64 mr-4">
+                            <div className="text-center text-gray-500">
+                                <p className="text-lg font-medium mb-2">Selecciona un diente</p>
+                                <p className="text-sm">Haz clic en cualquier diente del odontograma para ver sus detalles y herramientas</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

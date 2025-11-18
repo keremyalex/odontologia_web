@@ -135,10 +135,78 @@ export interface CuestionarioWrapper {
     fechaCreacion: string;
 }
 
+// Interfaces para el cuestionario odontológico
+export interface DolorDental {
+    ha_tenido_dolor?: boolean;
+    dolor_tipo_intensidad?: string[];
+    dolor_frecuencia?: string[];
+    dolor_provocado?: string[];
+    dolor_irradiado?: boolean;
+    dolor_irradiado_hacia_donde?: string;
+    dolor_puede_calmarlo_con_algo?: string;
+}
+
+export interface TipoLesionesDentales {
+    manchas?: boolean;
+    abultamiento_tejidos?: boolean;
+    ulceraciones?: boolean;
+    ampollas?: boolean;
+    otros?: boolean;
+}
+
+export interface CuestionarioOdontologico {
+    por_que_asistio_a_la_consulta?: string;
+    consulto_antes_con_algun_otro_profesional?: boolean;
+    tomo_algun_medicamento?: boolean;
+    nombre_de_los_medicamentos?: string;
+    desde_cuando_medicamentos?: string;
+    obtuvo_resultados_medicamentos?: boolean;
+    
+    dolor?: DolorDental;
+    
+    sufrio_golpe_en_los_dientes?: boolean;
+    golpe_en_dientes_cuando?: string;
+    golpe_en_dientes_como_se_produjo?: string;
+    se_le_fracturo_algun_diente?: boolean;
+    fractura_diente_cual?: string;
+    fractura_diente_recibio_tratamiento?: string;
+    
+    tiene_dificultad_para_hablar?: boolean;
+    tiene_dificultad_para_masticar?: boolean;
+    tiene_dificultad_para_abrir_la_boca?: boolean;
+    tiene_dificultad_para_tragar_alimentos?: boolean;
+    
+    ha_observado_algo_anormal_labios?: string;
+    ha_observado_algo_anormal_lengua?: string;
+    ha_observado_algo_anormal_paladar?: string;
+    ha_observado_algo_anormal_piso_boca?: string;
+    ha_observado_algo_anormal_carrillos?: string;
+    ha_observado_algo_anormal_otras_zonas?: string;
+    
+    tipo_de_lesiones_presenta?: TipoLesionesDentales;
+    
+    le_sangran_las_encias?: boolean;
+    le_sangran_las_encias_cuando?: string;
+    
+    sale_pus_de_algun_lugar_de_su_boca?: boolean;
+    sale_pus_de_donde?: string;
+    
+    tiene_movilidad_en_sus_dientes?: boolean;
+    al_morder_siente_altos_los_dientes?: boolean;
+    
+    ha_tenido_la_cara_hinchada?: boolean;
+    tratamiento_cara_hinchada?: string;
+    
+    momentos_de_azucar_diario?: string;
+    indice_de_placa?: string;
+    estado_de_la_higiene_bucal?: 'Muy bueno' | 'Bueno' | 'Deficiente' | 'Malo';
+}
+
 export interface HistoriaClinica {
     id?: number;
     pacienteId: number;
     cuestionario: CuestionarioCompleto | CuestionarioWrapper | string;
+    cuestionarioOdontologico?: CuestionarioOdontologico | string; // camelCase como espera el backend
     fecha?: string;
     profesionalId?: number;
     observaciones?: string;

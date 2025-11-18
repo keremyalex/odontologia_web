@@ -179,7 +179,7 @@ const PatientDetailPage: React.FC = () => {
                             asChild
                             size="sm"
                         >
-                            <Link to={`/patients/${paciente.id}/cuestionario`}>
+                            <Link to={`/patients/${paciente.id}/historia-completa`}>
                                 <FileText className="h-4 w-4 mr-2" />
                                 {historias.length > 0 ? 'Ver Historia' : 'Crear Historia'}
                             </Link>
@@ -324,7 +324,7 @@ const PatientDetailPage: React.FC = () => {
                                             size="sm"
                                             className="w-full"
                                         >
-                                            <Link to={`/patients/${paciente.id}/cuestionario`}>
+                                            <Link to={`/patients/${paciente.id}/historia-completa`}>
                                                 <Plus className="h-4 w-4 mr-2" />
                                                 Crear Historia
                                             </Link>
@@ -351,7 +351,7 @@ const PatientDetailPage: React.FC = () => {
                                                     variant="outline"
                                                     size="sm"
                                                 >
-                                                    <Link to={`/patients/${paciente.id}/cuestionario`}>
+                                                    <Link to={`/patients/${paciente.id}/historia-completa`}>
                                                         Ver
                                                     </Link>
                                                 </Button>
@@ -397,7 +397,7 @@ const PatientDetailPage: React.FC = () => {
                                     size="sm"
                                     className="w-full justify-start"
                                 >
-                                    <Link to={`/patients/${paciente.id}/cuestionario`}>
+                                    <Link to={`/patients/${paciente.id}/historia-completa`}>
                                         <FileText className="mr-2 h-4 w-4" />
                                         {historias.length > 0 ? 'Actualizar Historia' : 'Crear Historia'}
                                     </Link>

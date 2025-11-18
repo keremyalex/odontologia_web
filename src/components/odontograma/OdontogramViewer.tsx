@@ -3,9 +3,9 @@ import './odontogram.css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-    Save, 
-    RefreshCw, 
+import {
+    Save,
+    RefreshCw,
     AlertCircle,
     X
 } from 'lucide-react';
@@ -49,7 +49,7 @@ const createInitialTeeth = (): Tooth[] => {
         { id: 13, number: '1.3', position: 'Superior Derecho', group: 1 },
         { id: 12, number: '1.2', position: 'Superior Derecho', group: 1 },
         { id: 11, number: '1.1', position: 'Superior Derecho', group: 1 },
-        
+
         // Cuadrante Superior Izquierdo (Grupo 2) - De 2.1 a 2.8
         { id: 21, number: '2.1', position: 'Superior Izquierdo', group: 2 },
         { id: 22, number: '2.2', position: 'Superior Izquierdo', group: 2 },
@@ -59,7 +59,7 @@ const createInitialTeeth = (): Tooth[] => {
         { id: 26, number: '2.6', position: 'Superior Izquierdo', group: 2 },
         { id: 27, number: '2.7', position: 'Superior Izquierdo', group: 2 },
         { id: 28, number: '2.8', position: 'Superior Izquierdo', group: 2 },
-        
+
         // Cuadrante Inferior Izquierdo (Grupo 3) - De 3.1 a 3.8
         { id: 31, number: '3.1', position: 'Inferior Izquierdo', group: 3 },
         { id: 32, number: '3.2', position: 'Inferior Izquierdo', group: 3 },
@@ -69,7 +69,7 @@ const createInitialTeeth = (): Tooth[] => {
         { id: 36, number: '3.6', position: 'Inferior Izquierdo', group: 3 },
         { id: 37, number: '3.7', position: 'Inferior Izquierdo', group: 3 },
         { id: 38, number: '3.8', position: 'Inferior Izquierdo', group: 3 },
-        
+
         // Cuadrante Inferior Derecho (Grupo 4) - De 4.8 a 4.1
         { id: 48, number: '4.8', position: 'Inferior Derecho', group: 4 },
         { id: 47, number: '4.7', position: 'Inferior Derecho', group: 4 },
@@ -115,27 +115,11 @@ const ToothComponent: React.FC<{
     isSelected: boolean;
     readOnly?: boolean;
     onClick: (tooth: Tooth) => void;
-    onSurfaceClick: (tooth: Tooth, surface: string) => void;
-}> = ({ tooth, isSelected, readOnly, onClick, onSurfaceClick }) => {
-    
+}> = ({ tooth, isSelected, readOnly, onClick }) => {
+
     const getStatusColor = (status: string) => {
         const tool = toothTools.find(t => t.id === status);
         return tool ? tool.color : 'bg-green-200';
-    };
-
-    const getStatusSymbol = (status: string) => {
-        switch(status) {
-            case 'caries': return '○';
-            case 'obturado': return '■';
-            case 'corona': return '▣';
-            case 'endodoncia': return '⚡';
-            case 'implante': return '+';
-            case 'extraido': return '✕';
-            case 'fractura': return '⚠';
-            case 'puente': return '🔗';
-            case 'extraccion_indicada': return '●';
-            default: return '';
-        }
     };
 
     return (
@@ -144,9 +128,9 @@ const ToothComponent: React.FC<{
             <div className="text-xs text-blue-600 font-semibold mb-1">
                 {tooth.number}
             </div>
-            
+
             {/* Diente visual */}
-            <div 
+            <div
                 className={`
                     tooth relative w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer
                     ${isSelected ? 'ring-2 ring-blue-500' : ''}
@@ -160,69 +144,43 @@ const ToothComponent: React.FC<{
                 <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-px p-1">
                     {/* Superficie Vestibular (arriba centro) */}
                     <div></div>
-                    <div 
-                        className={`surface ${getStatusColor(tooth.surfaces.vestibular)} rounded-sm flex items-center justify-center text-xs cursor-pointer`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            !readOnly && onSurfaceClick(tooth, 'vestibular');
-                        }}
+                    <div
+                        className={`surface ${getStatusColor(tooth.surfaces.vestibular)} rounded-sm flex items-center justify-center text-xs`}
                         title="Vestibular"
                     >
-                        {getStatusSymbol(tooth.surfaces.vestibular)}
                     </div>
                     <div></div>
-                    
-                    {/* Superficie Mesial, Oclusal, Distal (fila media) */}
-                    <div 
-                        className={`surface ${getStatusColor(tooth.surfaces.mesial)} rounded-sm flex items-center justify-center text-xs cursor-pointer`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            !readOnly && onSurfaceClick(tooth, 'mesial');
-                        }}
+
+                    {/* Superficie Mesial (izquierda centro) */}
+                    <div
+                        className={`surface ${getStatusColor(tooth.surfaces.mesial)} rounded-sm flex items-center justify-center text-xs`}
                         title="Mesial"
                     >
-                        {getStatusSymbol(tooth.surfaces.mesial)}
                     </div>
-                    <div 
-                        className={`surface ${getStatusColor(tooth.surfaces.oclusal)} rounded-sm flex items-center justify-center text-xs cursor-pointer`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            !readOnly && onSurfaceClick(tooth, 'oclusal');
-                        }}
+                    <div
+                        className={`surface ${getStatusColor(tooth.surfaces.oclusal)} rounded-sm flex items-center justify-center text-xs`}
                         title="Oclusal"
                     >
-                        {getStatusSymbol(tooth.surfaces.oclusal)}
                     </div>
-                    <div 
-                        className={`surface ${getStatusColor(tooth.surfaces.distal)} rounded-sm flex items-center justify-center text-xs cursor-pointer`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            !readOnly && onSurfaceClick(tooth, 'distal');
-                        }}
+                    <div
+                        className={`surface ${getStatusColor(tooth.surfaces.distal)} rounded-sm flex items-center justify-center text-xs`}
                         title="Distal"
                     >
-                        {getStatusSymbol(tooth.surfaces.distal)}
                     </div>
-                    
+
                     {/* Superficie Lingual (abajo centro) */}
                     <div></div>
-                    <div 
-                        className={`surface ${getStatusColor(tooth.surfaces.lingual)} rounded-sm flex items-center justify-center text-xs cursor-pointer`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            !readOnly && onSurfaceClick(tooth, 'lingual');
-                        }}
+                    <div
+                        className={`surface ${getStatusColor(tooth.surfaces.lingual)} rounded-sm flex items-center justify-center text-xs`}
                         title="Lingual"
                     >
-                        {getStatusSymbol(tooth.surfaces.lingual)}
                     </div>
                     <div></div>
                 </div>
-                
+
                 {/* Status general del diente */}
                 {tooth.status !== 'sano' && (
                     <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-white border border-gray-300 rounded-full flex items-center justify-center text-xs">
-                        {getStatusSymbol(tooth.status)}
                     </div>
                 )}
             </div>
@@ -246,7 +204,7 @@ const ToothDetailPanel: React.FC<{
         if (!readOnly) {
             // Actualizar estado general del diente
             onToothUpdate(tooth.id, { status });
-            
+
             // También actualizar todas las superficies con el mismo estado
             const newSurfaces = {
                 vestibular: status,
@@ -308,25 +266,22 @@ const ToothDetailPanel: React.FC<{
             {/* Tabs */}
             <div className="flex mb-4 bg-gray-100 rounded-lg p-1">
                 <button
-                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                        activeTab === 'estado' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-800'
-                    }`}
+                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === 'estado' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-800'
+                        }`}
                     onClick={() => setActiveTab('estado')}
                 >
                     Estado
                 </button>
                 <button
-                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                        activeTab === 'notas' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-800'
-                    }`}
+                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === 'notas' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-800'
+                        }`}
                     onClick={() => setActiveTab('notas')}
                 >
                     Notas
                 </button>
                 <button
-                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                        activeTab === 'historial' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-800'
-                    }`}
+                    className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === 'historial' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-600 hover:text-gray-800'
+                        }`}
                     onClick={() => setActiveTab('historial')}
                 >
                     Historial
@@ -346,11 +301,10 @@ const ToothDetailPanel: React.FC<{
                                     <button
                                         key={tool.id}
                                         disabled={readOnly}
-                                        className={`p-2 rounded-lg border text-xs font-medium transition-all ${
-                                            selectedTool === tool.id
+                                        className={`p-2 rounded-lg border text-xs font-medium transition-all ${selectedTool === tool.id
                                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                 : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                                        } ${readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                            } ${readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                                         onClick={() => setSelectedTool(tool.id)}
                                         title={tool.description}
                                     >
@@ -366,10 +320,9 @@ const ToothDetailPanel: React.FC<{
                         {/* Mensaje de instrucción */}
                         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                             <p className="text-sm text-gray-600">
-                                Haz clic en cada superficie para aplicar: 
-                                <span className={`font-semibold ml-1 px-2 py-1 rounded text-white text-xs ${
-                                    toothTools.find(t => t.id === selectedTool)?.color || 'bg-red-500'
-                                }`}>
+                                Haz clic en cada superficie para aplicar:
+                                <span className={`font-semibold ml-1 px-2 py-1 rounded text-white text-xs ${toothTools.find(t => t.id === selectedTool)?.color || 'bg-red-500'
+                                    }`}>
                                     {toothTools.find(t => t.id === selectedTool)?.label || 'Caries'}
                                 </span>
                             </p>
@@ -384,9 +337,8 @@ const ToothDetailPanel: React.FC<{
                                     <button
                                         disabled={readOnly}
                                         onClick={() => handleSurfaceChange('vestibular', selectedTool)}
-                                        className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-t-lg border-2 transition-all ${
-                                            getStatusColor(tooth.surfaces.vestibular)
-                                        } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
+                                        className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-t-lg border-2 transition-all ${getStatusColor(tooth.surfaces.vestibular)
+                                            } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
                                         title={`Vestibular - ${toothTools.find(t => t.id === tooth.surfaces.vestibular)?.label || 'Sano'}`}
                                     >
                                         Vestibular
@@ -396,9 +348,8 @@ const ToothDetailPanel: React.FC<{
                                     <button
                                         disabled={readOnly}
                                         onClick={() => handleSurfaceChange('mesial', selectedTool)}
-                                        className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-6 h-16 rounded-l-lg border-2 transition-all ${
-                                            getStatusColor(tooth.surfaces.mesial)
-                                        } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
+                                        className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-6 h-16 rounded-l-lg border-2 transition-all ${getStatusColor(tooth.surfaces.mesial)
+                                            } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
                                         title={`Mesial - ${toothTools.find(t => t.id === tooth.surfaces.mesial)?.label || 'Sano'}`}
                                         style={{ writingMode: 'vertical-lr', textOrientation: 'mixed' }}
                                     >
@@ -409,9 +360,8 @@ const ToothDetailPanel: React.FC<{
                                     <button
                                         disabled={readOnly}
                                         onClick={() => handleSurfaceChange('oclusal', selectedTool)}
-                                        className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-lg border-2 transition-all ${
-                                            getStatusColor(tooth.surfaces.oclusal)
-                                        } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white text-center`}
+                                        className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-lg border-2 transition-all ${getStatusColor(tooth.surfaces.oclusal)
+                                            } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white text-center`}
                                         title={`Oclusal - ${toothTools.find(t => t.id === tooth.surfaces.oclusal)?.label || 'Sano'}`}
                                     >
                                         Oclusal
@@ -421,9 +371,8 @@ const ToothDetailPanel: React.FC<{
                                     <button
                                         disabled={readOnly}
                                         onClick={() => handleSurfaceChange('distal', selectedTool)}
-                                        className={`absolute right-0 top-1/2 transform -translate-y-1/2 w-6 h-16 rounded-r-lg border-2 transition-all ${
-                                            getStatusColor(tooth.surfaces.distal)
-                                        } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
+                                        className={`absolute right-0 top-1/2 transform -translate-y-1/2 w-6 h-16 rounded-r-lg border-2 transition-all ${getStatusColor(tooth.surfaces.distal)
+                                            } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
                                         title={`Distal - ${toothTools.find(t => t.id === tooth.surfaces.distal)?.label || 'Sano'}`}
                                         style={{ writingMode: 'vertical-lr', textOrientation: 'mixed' }}
                                     >
@@ -434,9 +383,8 @@ const ToothDetailPanel: React.FC<{
                                     <button
                                         disabled={readOnly}
                                         onClick={() => handleSurfaceChange('lingual', selectedTool)}
-                                        className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-b-lg border-2 transition-all ${
-                                            getStatusColor(tooth.surfaces.lingual)
-                                        } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
+                                        className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-b-lg border-2 transition-all ${getStatusColor(tooth.surfaces.lingual)
+                                            } border-gray-400 ${readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} flex items-center justify-center text-xs font-medium text-white`}
                                         title={`Lingual - ${toothTools.find(t => t.id === tooth.surfaces.lingual)?.label || 'Sano'}`}
                                     >
                                         Lingual
@@ -450,11 +398,10 @@ const ToothDetailPanel: React.FC<{
                             <button
                                 disabled={readOnly}
                                 onClick={() => handleStatusChange(selectedTool)}
-                                className={`w-full py-3 px-4 rounded-lg border-2 transition-all ${
-                                    readOnly 
+                                className={`w-full py-3 px-4 rounded-lg border-2 transition-all ${readOnly
                                         ? 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-50'
                                         : `bg-blue-50 border-blue-300 hover:bg-blue-100 cursor-pointer text-blue-700`
-                                } text-sm font-medium`}
+                                    } text-sm font-medium`}
                             >
                                 Aplicar a todo el diente
                             </button>
@@ -524,7 +471,7 @@ const ToothDetailPanel: React.FC<{
                 <div className="pt-4 border-t">
                     <div className="flex items-center justify-between text-sm text-gray-600">
                         <span>Estado actual:</span>
-                        <Badge 
+                        <Badge
                             className={`${getStatusColor(tooth.status)} text-white`}
                             variant="secondary"
                         >
@@ -543,9 +490,8 @@ const CustomOdontogram: React.FC<{
     selectedTooth: Tooth | null;
     readOnly?: boolean;
     onToothClick: (tooth: Tooth) => void;
-    onSurfaceClick: (tooth: Tooth, surface: string) => void;
-}> = ({ teeth, selectedTooth, readOnly, onToothClick, onSurfaceClick }) => {
-    
+}> = ({ teeth, selectedTooth, readOnly, onToothClick }) => {
+
     const getTeethByGroup = (group: number) => {
         return teeth.filter(tooth => tooth.group === group);
     };
@@ -566,12 +512,11 @@ const CustomOdontogram: React.FC<{
                                     isSelected={selectedTooth?.id === tooth.id}
                                     readOnly={readOnly}
                                     onClick={onToothClick}
-                                    onSurfaceClick={onSurfaceClick}
                                 />
                             ))}
                         </div>
                     </div>
-                    
+
                     {/* Grupo 2 - Superior Izquierdo (2.1 a 2.8) */}
                     <div className="group-container">
                         <div className="text-center text-blue-600 font-medium mb-3">Grupo 2</div>
@@ -583,7 +528,6 @@ const CustomOdontogram: React.FC<{
                                     isSelected={selectedTooth?.id === tooth.id}
                                     readOnly={readOnly}
                                     onClick={onToothClick}
-                                    onSurfaceClick={onSurfaceClick}
                                 />
                             ))}
                         </div>
@@ -604,13 +548,12 @@ const CustomOdontogram: React.FC<{
                                     isSelected={selectedTooth?.id === tooth.id}
                                     readOnly={readOnly}
                                     onClick={onToothClick}
-                                    onSurfaceClick={onSurfaceClick}
                                 />
                             ))}
                         </div>
                         <div className="text-center text-blue-600 font-medium mt-3">Grupo 4</div>
                     </div>
-                    
+
                     {/* Grupo 3 - Inferior Izquierdo (3.1 a 3.8) */}
                     <div className="group-container">
                         <div className="flex gap-2">
@@ -621,7 +564,6 @@ const CustomOdontogram: React.FC<{
                                     isSelected={selectedTooth?.id === tooth.id}
                                     readOnly={readOnly}
                                     onClick={onToothClick}
-                                    onSurfaceClick={onSurfaceClick}
                                 />
                             ))}
                         </div>
@@ -651,7 +593,7 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
     useEffect(() => {
         if (odontograma?.dientes) {
             try {
-                const loadedTeeth = typeof odontograma.dientes === 'string' 
+                const loadedTeeth = typeof odontograma.dientes === 'string'
                     ? JSON.parse(odontograma.dientes)
                     : odontograma.dientes;
                 setTeeth(loadedTeeth);
@@ -679,26 +621,6 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
         setHasChanges(true);
     };
 
-    // Manejar click en superficie
-    const handleSurfaceClick = (tooth: Tooth, surface: string) => {
-        if (readOnly) return;
-
-        const updatedTeeth = teeth.map(t =>
-            t.id === tooth.id
-                ? {
-                    ...t,
-                    surfaces: {
-                        ...t.surfaces,
-                        [surface]: currentTool
-                    }
-                }
-                : t
-        );
-
-        setTeeth(updatedTeeth);
-        setHasChanges(true);
-    };
-
     // Manejar actualización de diente desde el panel lateral
     const handleToothUpdate = (toothId: number, updates: Partial<Tooth>) => {
         if (readOnly) return;
@@ -710,12 +632,12 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
         );
 
         setTeeth(updatedTeeth);
-        
+
         // Actualizar el diente seleccionado si es el mismo
         if (selectedTooth && selectedTooth.id === toothId) {
             setSelectedTooth({ ...selectedTooth, ...updates });
         }
-        
+
         setHasChanges(true);
     };
 
@@ -736,7 +658,7 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
         );
 
         setTeeth(updatedTeeth);
-        
+
         // Actualizar el diente seleccionado si es el mismo
         if (selectedTooth && selectedTooth.id === toothId) {
             setSelectedTooth({
@@ -747,7 +669,7 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                 }
             });
         }
-        
+
         setHasChanges(true);
     };
 
@@ -795,7 +717,7 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                                     </Badge>
                                 )}
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
                                 {hasChanges && (
                                     <Badge variant="secondary" className="text-orange-600">
@@ -845,14 +767,13 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                                 </div>
 
                                 {/* Odontograma */}
-                                <CustomOdontogram 
+                                <CustomOdontogram
                                     teeth={teeth}
                                     selectedTooth={selectedTooth}
                                     readOnly={readOnly}
                                     onToothClick={handleToothClick}
-                                    onSurfaceClick={handleSurfaceClick}
                                 />
-                                
+
                                 {/* Mensaje informativo cuando no hay diente seleccionado */}
                                 {!selectedTooth && !readOnly && (
                                     <div className="mt-8 text-center text-gray-500">
@@ -868,7 +789,7 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                 {/* Panel lateral - Solo aparece cuando hay un diente seleccionado */}
                 {selectedTooth && (
                     <div className="w-80">
-                        <ToothDetailPanel 
+                        <ToothDetailPanel
                             tooth={selectedTooth}
                             readOnly={readOnly}
                             onToothUpdate={handleToothUpdate}

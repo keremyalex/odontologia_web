@@ -1,0 +1,15 @@
+# Ignorar dependencias locales y archivos de configuración
+node_modules
+npm-debug.log
+
+# Ignorar archivos del entorno de Git
+.git
+.gitignore
+
+# Ignorar archivos temporales y de logs
+tmp
+logs
+
+# Ignorar Dockerfile y el propio .dockerignore para la Etapa 1
+Dockerfile
+.dockerignore

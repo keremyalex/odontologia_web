@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Filter, Clock, Calendar, Loader2, Eye, EyeOff, Pause, User as UserIcon } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -38,6 +37,7 @@ const FranjasHorariasPage: React.FC = () => {
         horaInicio: '',
         horaFin: '',
         duracionCitaMin: 30,
+        cuposMaximos: undefined,
         estado: 'activo',
         observaciones: ''
     });
@@ -59,21 +59,19 @@ const FranjasHorariasPage: React.FC = () => {
                 apiService.getEspecialidades(),
                 apiService.getDocentes()
             ]);
-            
+
             setFranjas(franjasData);
             setEspecialidades(especialidadesData);
             setDocentes(docentesData);
         } catch (error) {
             console.error('Error al cargar datos:', error);
-            // Mantener arrays vacíos para permitir crear nuevos registros
-            setEspecialidades([]);
-            setDocentes([]);
-            setFranjas([]);
-            // No mostrar error toast ya que es normal no tener datos al inicio
+            toast.error('Error al cargar los datos');
         } finally {
             setLoading(false);
         }
-    };    const fetchFranjas = async () => {
+    };
+
+    const fetchFranjas = async () => {
         try {
             const params = new URLSearchParams();
 
@@ -123,6 +121,7 @@ const FranjasHorariasPage: React.FC = () => {
                     horaInicio: formData.horaInicio,
                     horaFin: formData.horaFin,
                     duracionCitaMin: formData.duracionCitaMin,
+                    cuposMaximos: formData.cuposMaximos,
                     estado: formData.estado,
                     observaciones: formData.observaciones || undefined
                 };
@@ -165,6 +164,7 @@ const FranjasHorariasPage: React.FC = () => {
             horaInicio: franja.horaInicio,
             horaFin: franja.horaFin,
             duracionCitaMin: franja.duracionCitaMin,
+            cuposMaximos: franja.cuposMaximos,
             estado: franja.estado,
             observaciones: franja.observaciones || ''
         });
@@ -181,6 +181,7 @@ const FranjasHorariasPage: React.FC = () => {
             horaInicio: '',
             horaFin: '',
             duracionCitaMin: 30,
+            cuposMaximos: undefined,
             estado: 'activo',
             observaciones: ''
         });
@@ -272,23 +273,10 @@ const FranjasHorariasPage: React.FC = () => {
 
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <div>
-                            <Button 
-                                onClick={() => setEditingFranja(null)}
-                                disabled={especialidades.length === 0 || docentes.length === 0}
-                                className={especialidades.length === 0 || docentes.length === 0 ? 'cursor-not-allowed' : ''}
-                                title={
-                                    especialidades.length === 0 
-                                        ? 'Primero debe crear especialidades' 
-                                        : docentes.length === 0 
-                                        ? 'Primero debe crear usuarios con rol docente'
-                                        : undefined
-                                }
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Nueva Franja
-                            </Button>
-                        </div>
+                        <Button onClick={() => setEditingFranja(null)}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nueva Franja
+                        </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-lg">
                         <DialogHeader>
@@ -351,17 +339,9 @@ const FranjasHorariasPage: React.FC = () => {
                                         <SelectValue placeholder="Seleccionar especialidad" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {especialidades.length > 0 ? (
-                                            especialidades.map((esp) => (
-                                                <SelectItem key={esp.id} value={esp.id?.toString() || ''}>
-                                                    {esp.nombre}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="no-data" disabled>
-                                                No hay especialidades disponibles
-                                            </SelectItem>
-                                        )}
+                                        {especialidades.map((esp) => (
+                                            <SelectItem key={esp.id} value={esp.id.toString()}>{esp.nombre}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -377,17 +357,9 @@ const FranjasHorariasPage: React.FC = () => {
                                         <SelectValue placeholder="Seleccionar docente" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {docentes.length > 0 ? (
-                                            docentes.map((docente) => (
-                                                <SelectItem key={docente.id} value={docente.id?.toString() || ''}>
-                                                    {docente.nombre}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="no-data" disabled>
-                                                No hay docentes disponibles
-                                            </SelectItem>
-                                        )}
+                                        {docentes.map((docente) => (
+                                            <SelectItem key={docente.id} value={docente.id.toString()}>{docente.nombre}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -427,6 +399,25 @@ const FranjasHorariasPage: React.FC = () => {
                                         disabled={submitting}
                                         required
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="cuposMaximos">Cupos Máximos (opcional)</Label>
+                                    <Input
+                                        id="cuposMaximos"
+                                        type="number"
+                                        min="1"
+                                        max="50"
+                                        value={formData.cuposMaximos || ''}
+                                        onChange={(e) => setFormData(prev => ({ 
+                                            ...prev, 
+                                            cuposMaximos: e.target.value ? parseInt(e.target.value) : undefined 
+                                        }))}
+                                        placeholder="Automático si no se especifica"
+                                        disabled={submitting}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Si no se especifica, se calculará automáticamente según la duración
+                                    </p>
                                 </div>
                             </div>
 
@@ -469,7 +460,7 @@ const FranjasHorariasPage: React.FC = () => {
                         <div className="space-y-2">
                             <Label>Día de la Semana</Label>
                             <Select
-                                value={filters.dia?.toString() || 'all'}
+                                value={filters.dia?.toString() || ''}
                                 onValueChange={(value) => setFilters(prev => ({ ...prev, dia: value === 'all' ? undefined : parseInt(value) }))}
                             >
                                 <SelectTrigger>
@@ -487,7 +478,7 @@ const FranjasHorariasPage: React.FC = () => {
                         <div className="space-y-2">
                             <Label>Especialidad</Label>
                             <Select
-                                value={filters.especialidad?.toString() || 'all'}
+                                value={filters.especialidad?.toString() || ''}
                                 onValueChange={(value) => setFilters(prev => ({ ...prev, especialidad: value === 'all' ? undefined : parseInt(value) }))}
                             >
                                 <SelectTrigger>
@@ -495,7 +486,7 @@ const FranjasHorariasPage: React.FC = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todas las especialidades</SelectItem>
-                                    {especialidades.map((esp) => (
+                                    {especialidades.map(esp => (
                                         <SelectItem key={esp.id} value={esp.id.toString()}>{esp.nombre}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -505,7 +496,7 @@ const FranjasHorariasPage: React.FC = () => {
                         <div className="space-y-2">
                             <Label>Docente</Label>
                             <Select
-                                value={filters.responsable?.toString() || 'all'}
+                                value={filters.responsable?.toString() || ''}
                                 onValueChange={(value) => setFilters(prev => ({ ...prev, responsable: value === 'all' ? undefined : parseInt(value) }))}
                             >
                                 <SelectTrigger>
@@ -513,7 +504,7 @@ const FranjasHorariasPage: React.FC = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todos los docentes</SelectItem>
-                                    {docentes.map((docente) => (
+                                    {docentes.map(docente => (
                                         <SelectItem key={docente.id} value={docente.id.toString()}>{docente.nombre}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -552,33 +543,13 @@ const FranjasHorariasPage: React.FC = () => {
                             <p className="text-muted-foreground mb-4">
                                 {Object.keys(filters).some(key => filters[key as keyof FranjaHorariaFilters])
                                     ? 'No se encontraron franjas con los filtros aplicados'
-                                    : especialidades.length === 0
-                                    ? 'Primero debe crear especialidades médicas'
-                                    : docentes.length === 0
-                                    ? 'Primero debe crear usuarios con rol docente'
                                     : 'Crea la primera franja horaria para una especialidad'
                                 }
                             </p>
-                            {especialidades.length === 0 ? (
-                                <Button asChild>
-                                    <Link to="/admin/especialidades">
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Crear Especialidades
-                                    </Link>
-                                </Button>
-                            ) : docentes.length === 0 ? (
-                                <Button asChild>
-                                    <Link to="/admin/usuarios">
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Crear Usuarios Docentes
-                                    </Link>
-                                </Button>
-                            ) : (
-                                <Button onClick={() => setIsDialogOpen(true)}>
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Nueva Franja
-                                </Button>
-                            )}
+                            <Button onClick={() => setIsDialogOpen(true)}>
+                                <Plus className="w-4 h-4 mr-2" />
+                                Nueva Franja
+                            </Button>
                         </div>
                     ) : (
                         <div className="space-y-6">
@@ -591,6 +562,7 @@ const FranjasHorariasPage: React.FC = () => {
                                             <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Especialidad</th>
                                             <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Horario</th>
                                             <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Docente</th>
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Cupos</th>
                                             <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Estado</th>
                                             <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Acciones</th>
                                         </tr>
@@ -635,6 +607,22 @@ const FranjasHorariasPage: React.FC = () => {
                                                                 <div className="flex items-center gap-2">
                                                                     <UserIcon className="w-4 h-4 text-gray-500" />
                                                                     <span>{responsable?.nombre || 'Responsable no encontrado'}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="border border-gray-200 px-4 py-3">
+                                                                <div className="text-sm">
+                                                                    <div className="font-medium text-blue-600">
+                                                                        {franja.cuposMaximos !== null && franja.cuposMaximos !== undefined 
+                                                                            ? `${franja.cuposMaximos} cupos` 
+                                                                            : `${franja.cuposCalculados} cupos`
+                                                                        }
+                                                                    </div>
+                                                                    <div className="text-xs text-gray-500">
+                                                                        {franja.cuposMaximos !== null && franja.cuposMaximos !== undefined 
+                                                                            ? `Manual (calc: ${franja.cuposCalculados})` 
+                                                                            : 'Automático'
+                                                                        }
+                                                                    </div>
                                                                 </div>
                                                             </td>
                                                             <td className="border border-gray-200 px-4 py-3">
@@ -692,7 +680,7 @@ const FranjasHorariasPage: React.FC = () => {
                                                             <Calendar className="w-4 h-4 mx-auto mt-1 text-blue-600" />
                                                         </div>
                                                     </td>
-                                                    <td colSpan={5} className="border border-gray-200 px-4 py-6 text-center text-gray-500 italic">
+                                                    <td colSpan={6} className="border border-gray-200 px-4 py-6 text-center text-gray-500 italic">
                                                         Sin franjas horarias programadas
                                                     </td>
                                                 </tr>

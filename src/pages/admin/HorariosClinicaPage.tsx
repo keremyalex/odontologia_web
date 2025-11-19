@@ -328,7 +328,8 @@ const HorariosClinicaPage: React.FC = () => {
                                             )}
 
                                             <div className="text-sm text-muted-foreground mt-2">
-                                                Creado: {new Date(horario.createdAt).toLocaleDateString()}
+                                                Creado: {horario.created_at || horario.createdAt ? 
+                                                    new Date(horario.created_at || horario.createdAt!).toLocaleDateString() : 'N/A'}
                                             </div>
                                         </div>
                                         <div className="flex gap-2">

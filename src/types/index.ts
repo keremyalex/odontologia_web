@@ -226,19 +226,24 @@ export interface Especialidad {
     id: number;
     nombre: string;
     descripcion?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    activo?: boolean; // Opcional porque el backend puede no incluirlo
+    created_at?: string;
+    updated_at?: string;
+    createdAt?: string; // Para compatibilidad con el backend
+    updatedAt?: string; // Para compatibilidad con el backend
     franjasHorarias?: FranjaHoraria[];
 }
 
 export interface CreateEspecialidadDto {
     nombre: string;
     descripcion?: string;
+    activo?: boolean;
 }
 
 export interface UpdateEspecialidadDto {
     nombre?: string;
     descripcion?: string;
+    activo?: boolean;
 }
 
 export interface HorarioClinica {
@@ -248,8 +253,10 @@ export interface HorarioClinica {
     horaCierre: string; // Formato "HH:MM"
     activo: boolean;
     descripcion?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    created_at?: string;
+    createdAt?: string; // Compatibilidad con backend
+    updated_at?: string;
+    updatedAt?: string; // Compatibilidad con backend
 }
 
 export interface CreateHorarioClinicaDto {
@@ -276,10 +283,12 @@ export interface FranjaHoraria {
     horaInicio: string; // Formato "HH:MM"
     horaFin: string; // Formato "HH:MM"
     duracionCitaMin: number; // default: 30
+    cuposMaximos?: number; // Límite manual opcional
+    cuposCalculados: number; // Calculado automáticamente
     estado: 'activo' | 'inactivo' | 'suspendido';
     observaciones?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    created_at?: string;
+    updated_at?: string;
     especialidad?: Especialidad;
     responsable?: User;
 }
@@ -291,6 +300,7 @@ export interface CreateFranjaHorariaDto {
     horaInicio: string;
     horaFin: string;
     duracionCitaMin?: number;
+    cuposMaximos?: number; // Límite manual opcional
     estado?: 'activo' | 'inactivo' | 'suspendido';
     observaciones?: string;
 }
@@ -302,6 +312,7 @@ export interface UpdateFranjaHorariaDto {
     horaInicio?: string;
     horaFin?: string;
     duracionCitaMin?: number;
+    cuposMaximos?: number; // Límite manual opcional
     estado?: 'activo' | 'inactivo' | 'suspendido';
     observaciones?: string;
 }

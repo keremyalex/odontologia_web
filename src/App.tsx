@@ -19,6 +19,7 @@ import UserFormPage from './pages/UserFormPage';
 import EspecialidadesPage from './pages/admin/EspecialidadesPage';
 import HorariosClinicaPage from './pages/admin/HorariosClinicaPage';
 import FranjasHorariasPage from './pages/admin/FranjasHorariasPage';
+import CitasPage from './pages/admin/CitasPage';
 
 function App() {
   return (
@@ -148,6 +149,14 @@ function App() {
               element={
                 <ProtectedRoute requiredRoles={['admin', 'docente']}>
                   <FranjasHorariasPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/citas"
+              element={
+                <ProtectedRoute requiredRoles={['admin', 'recepcion', 'docente']}>
+                  <CitasPage />
                 </ProtectedRoute>
               }
             />

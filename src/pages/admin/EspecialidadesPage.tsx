@@ -36,9 +36,13 @@ const EspecialidadesPage: React.FC = () => {
             setEspecialidades(data);
         } catch (error) {
             console.error('Error al cargar especialidades:', error);
-            // Mantener array vacío para permitir crear nuevas especialidades
-            setEspecialidades([]);
-            // No mostrar error toast ya que es normal no tener datos al inicio
+            // Cargar desde localStorage como respaldo
+            const localEspecialidades = localStorage.getItem('especialidades');
+            if (localEspecialidades) {
+                setEspecialidades(JSON.parse(localEspecialidades));
+            } else {
+                setEspecialidades([]);
+            }
         } finally {
             setLoading(false);
         }
@@ -69,6 +73,24 @@ const EspecialidadesPage: React.FC = () => {
             }
 
             await fetchEspecialidades();
+            
+            // Guardar en localStorage como respaldo
+            const currentEspecialidades = JSON.parse(localStorage.getItem('especialidades') || '[]');
+            if (editingEspecialidad) {
+                const updatedEspecialidades = currentEspecialidades.map((e: any) => 
+                    e.id === editingEspecialidad.id ? { ...e, ...formData, updatedAt: new Date() } : e
+                );
+                localStorage.setItem('especialidades', JSON.stringify(updatedEspecialidades));
+            } else {
+                const newEspecialidad = { 
+                    id: Date.now(), 
+                    ...formData, 
+                    createdAt: new Date(), 
+                    updatedAt: new Date() 
+                };
+                localStorage.setItem('especialidades', JSON.stringify([...currentEspecialidades, newEspecialidad]));
+            }
+            
             handleCloseDialog();
         } catch (error: any) {
             console.error('Error al guardar especialidad:', error);
@@ -83,6 +105,12 @@ const EspecialidadesPage: React.FC = () => {
         try {
             await apiService.deleteEspecialidad(id);
             toast.success('Especialidad eliminada correctamente');
+            
+            // Eliminar de localStorage como respaldo
+            const currentEspecialidades = JSON.parse(localStorage.getItem('especialidades') || '[]');
+            const updatedEspecialidades = currentEspecialidades.filter((e: any) => e.id !== id);
+            localStorage.setItem('especialidades', JSON.stringify(updatedEspecialidades));
+            
             await fetchEspecialidades();
         } catch (error: any) {
             console.error('Error al eliminar especialidad:', error);
@@ -233,7 +261,8 @@ const EspecialidadesPage: React.FC = () => {
                                             )}
                                             <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                                                 <span>
-                                                    Creada: {new Date(especialidad.createdAt).toLocaleDateString()}
+                                                    Creada: {especialidad.created_at || especialidad.createdAt ? 
+                                                        new Date(especialidad.created_at || especialidad.createdAt!).toLocaleDateString() : 'N/A'}
                                                 </span>
                                                 {especialidad.franjasHorarias && (
                                                     <Badge variant="outline">

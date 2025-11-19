@@ -190,6 +190,58 @@ const FranjasHorariasPage: React.FC = () => {
         setFilters({});
     };
 
+    // Funciones helper para la vista de horario
+    const getDiaName = (dia: number): string => {
+        const dias = {
+            1: 'Lunes',
+            2: 'Martes', 
+            3: 'Miércoles',
+            4: 'Jueves',
+            5: 'Viernes',
+            6: 'Sábado',
+            7: 'Domingo'
+        };
+        return dias[dia as keyof typeof dias] || '';
+    };
+
+    const groupFranjasByDay = () => {
+        const grouped: { [key: number]: FranjaHoraria[] } = {};
+        
+        // Inicializar todos los días
+        for (let i = 1; i <= 7; i++) {
+            grouped[i] = [];
+        }
+        
+        // Agrupar franjas por día y ordenar por hora
+        franjas.forEach(franja => {
+            if (!grouped[franja.diaSemana]) {
+                grouped[franja.diaSemana] = [];
+            }
+            grouped[franja.diaSemana].push(franja);
+        });
+        
+        // Ordenar cada día por hora de inicio
+        Object.keys(grouped).forEach(dia => {
+            grouped[parseInt(dia)].sort((a, b) => {
+                return a.horaInicio.localeCompare(b.horaInicio);
+            });
+        });
+        
+        return grouped;
+    };
+
+    const getEspecialidadColor = (especialidadId: number): string => {
+        const colors = [
+            'bg-blue-100 text-blue-800 border-blue-200',
+            'bg-green-100 text-green-800 border-green-200', 
+            'bg-purple-100 text-purple-800 border-purple-200',
+            'bg-orange-100 text-orange-800 border-orange-200',
+            'bg-pink-100 text-pink-800 border-pink-200',
+            'bg-indigo-100 text-indigo-800 border-indigo-200'
+        ];
+        return colors[especialidadId % colors.length];
+    };
+
     const formatTime = (time: string) => {
         return time.slice(0, 5);
     };
@@ -529,79 +581,126 @@ const FranjasHorariasPage: React.FC = () => {
                             )}
                         </div>
                     ) : (
-                        <div className="grid gap-4">
-                            {franjas.map((franja) => (
-                                <div key={franja.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="w-5 h-5 text-blue-600" />
-                                                    <span className="font-semibold text-lg">
-                                                        {formatTime(franja.horaInicio)} - {formatTime(franja.horaFin)}
-                                                    </span>
-                                                </div>
-                                                {getEstadoBadge(franja.estado)}
-                                                <Badge variant="outline">
-                                                    {DIAS_SEMANA[franja.diaSemana as keyof typeof DIAS_SEMANA]}
-                                                </Badge>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground mb-2">
-                                                <div className="flex items-center gap-1">
-                                                    <Calendar className="w-4 h-4" />
-                                                    <span>{franja.especialidad?.nombre || 'Especialidad no encontrada'}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <UserIcon className="w-4 h-4" />
-                                                    <span>{franja.responsable?.nombre || 'Responsable no encontrado'}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Clock className="w-4 h-4" />
-                                                    <span>Citas de {franja.duracionCitaMin} min</span>
-                                                </div>
-                                            </div>
-
-                                            {franja.observaciones && (
-                                                <p className="text-muted-foreground text-sm mt-1">{franja.observaciones}</p>
-                                            )}
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => handleEdit(franja)}
-                                            >
-                                                <Edit2 className="w-4 h-4" />
-                                            </Button>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button size="sm" variant="outline">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Esta acción no se puede deshacer. Se eliminará permanentemente esta franja horaria.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() => handleDelete(franja.id)}
-                                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                        >
-                                                            Eliminar
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="space-y-6">
+                            {/* Tabla de Horarios por Día */}
+                            <div className="overflow-x-auto">
+                                <table className="w-full border-collapse border border-gray-200">
+                                    <thead>
+                                        <tr className="bg-gray-50">
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Día</th>
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Especialidad</th>
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Horario</th>
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Docente</th>
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Estado</th>
+                                            <th className="border border-gray-200 px-4 py-3 text-left font-semibold">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.entries(groupFranjasByDay()).map(([dia, franjasDia]) => 
+                                            franjasDia.length > 0 ? (
+                                                franjasDia.map((franja, index) => {
+                                                    const especialidad = especialidades.find(e => e.id === franja.especialidadId);
+                                                    const responsable = docentes.find(d => d.id === franja.responsableId);
+                                                    
+                                                    return (
+                                                        <tr key={franja.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}>
+                                                            {index === 0 && (
+                                                                <td 
+                                                                    className="border border-gray-200 px-4 py-3 font-medium bg-blue-50" 
+                                                                    rowSpan={franjasDia.length}
+                                                                >
+                                                                    <div className="text-center">
+                                                                        <div className="font-bold text-blue-900">{getDiaName(parseInt(dia))}</div>
+                                                                        <Calendar className="w-4 h-4 mx-auto mt-1 text-blue-600" />
+                                                                    </div>
+                                                                </td>
+                                                            )}
+                                                            <td className="border border-gray-200 px-4 py-3">
+                                                                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getEspecialidadColor(franja.especialidadId)}`}>
+                                                                    {especialidad?.nombre || 'Especialidad no encontrada'}
+                                                                </div>
+                                                            </td>
+                                                            <td className="border border-gray-200 px-4 py-3">
+                                                                <div className="flex items-center gap-1">
+                                                                    <Clock className="w-4 h-4 text-gray-500" />
+                                                                    <span className="font-mono">
+                                                                        {formatTime(franja.horaInicio)} - {formatTime(franja.horaFin)}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-xs text-gray-500 mt-1">
+                                                                    {franja.duracionCitaMin} min por cita
+                                                                </div>
+                                                            </td>
+                                                            <td className="border border-gray-200 px-4 py-3">
+                                                                <div className="flex items-center gap-2">
+                                                                    <UserIcon className="w-4 h-4 text-gray-500" />
+                                                                    <span>{responsable?.nombre || 'Responsable no encontrado'}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="border border-gray-200 px-4 py-3">
+                                                                {getEstadoBadge(franja.estado)}
+                                                            </td>
+                                                            <td className="border border-gray-200 px-4 py-3">
+                                                                <div className="flex items-center gap-1">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => handleEdit(franja)}
+                                                                        className="h-8 w-8 p-0"
+                                                                    >
+                                                                        <Edit2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                    <AlertDialog>
+                                                                        <AlertDialogTrigger asChild>
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                            >
+                                                                                <Trash2 className="w-4 h-4" />
+                                                                            </Button>
+                                                                        </AlertDialogTrigger>
+                                                                        <AlertDialogContent>
+                                                                            <AlertDialogHeader>
+                                                                                <AlertDialogTitle>¿Eliminar franja horaria?</AlertDialogTitle>
+                                                                                <AlertDialogDescription>
+                                                                                    Esta acción no se puede deshacer. Se eliminará la franja horaria 
+                                                                                    del {getDiaName(franja.diaSemana)} de {formatTime(franja.horaInicio)} a {formatTime(franja.horaFin)}.
+                                                                                </AlertDialogDescription>
+                                                                            </AlertDialogHeader>
+                                                                            <AlertDialogFooter>
+                                                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                                                <AlertDialogAction 
+                                                                                    onClick={() => handleDelete(franja.id!)}
+                                                                                    className="bg-red-600 hover:bg-red-700"
+                                                                                >
+                                                                                    Eliminar
+                                                                                </AlertDialogAction>
+                                                                            </AlertDialogFooter>
+                                                                        </AlertDialogContent>
+                                                                    </AlertDialog>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr key={`empty-${dia}`}>
+                                                    <td className="border border-gray-200 px-4 py-3 font-medium bg-blue-50 text-center">
+                                                        <div className="text-center">
+                                                            <div className="font-bold text-blue-900">{getDiaName(parseInt(dia))}</div>
+                                                            <Calendar className="w-4 h-4 mx-auto mt-1 text-blue-600" />
+                                                        </div>
+                                                    </td>
+                                                    <td colSpan={5} className="border border-gray-200 px-4 py-6 text-center text-gray-500 italic">
+                                                        Sin franjas horarias programadas
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </CardContent>

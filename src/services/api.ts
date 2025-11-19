@@ -148,6 +148,87 @@ class ApiService {
         const response: AxiosResponse<HistoriaClinica> = await this.api.patch(`/historias/${id}`, data);
         return response.data;
     }
+
+    // Métodos de especialidades
+    async getEspecialidades(): Promise<any[]> {
+        const response = await this.api.get('/especialidades');
+        return response.data;
+    }
+
+    async getEspecialidad(id: number): Promise<any> {
+        const response = await this.api.get(`/especialidades/${id}`);
+        return response.data;
+    }
+
+    async createEspecialidad(data: any): Promise<any> {
+        const response = await this.api.post('/especialidades', data);
+        return response.data;
+    }
+
+    async updateEspecialidad(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/especialidades/${id}`, data);
+        return response.data;
+    }
+
+    async deleteEspecialidad(id: number): Promise<void> {
+        await this.api.delete(`/especialidades/${id}`);
+    }
+
+    // Métodos de horarios de clínica
+    async getHorariosClinica(): Promise<any[]> {
+        const response = await this.api.get('/horarios/clinica');
+        return response.data;
+    }
+
+    async getHorarioClinica(id: number): Promise<any> {
+        const response = await this.api.get(`/horarios/clinica/${id}`);
+        return response.data;
+    }
+
+    async createHorarioClinica(data: any): Promise<any> {
+        const response = await this.api.post('/horarios/clinica', data);
+        return response.data;
+    }
+
+    async updateHorarioClinica(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/horarios/clinica/${id}`, data);
+        return response.data;
+    }
+
+    async deleteHorarioClinica(id: number): Promise<void> {
+        await this.api.delete(`/horarios/clinica/${id}`);
+    }
+
+    // Métodos de franjas horarias
+    async getFranjasHorarias(params?: any): Promise<any[]> {
+        const response = await this.api.get('/horarios/franjas', { params });
+        return response.data;
+    }
+
+    async getFranjaHoraria(id: number): Promise<any> {
+        const response = await this.api.get(`/horarios/franjas/${id}`);
+        return response.data;
+    }
+
+    async createFranjaHoraria(data: any): Promise<any> {
+        const response = await this.api.post('/horarios/franjas', data);
+        return response.data;
+    }
+
+    async updateFranjaHoraria(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/horarios/franjas/${id}`, data);
+        return response.data;
+    }
+
+    async deleteFranjaHoraria(id: number): Promise<void> {
+        await this.api.delete(`/horarios/franjas/${id}`);
+    }
+
+    // Método para obtener usuarios docentes
+    async getDocentes(): Promise<any[]> {
+        const response = await this.api.get('/auth/users?rol=docente');
+        return response.data;
+    }
 }
 
 export const apiService = new ApiService();

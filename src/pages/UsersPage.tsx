@@ -49,6 +49,13 @@ const UsersPage: React.FC = () => {
         try {
             setLoading(true);
             const usersData = await apiService.getUsers();
+            console.log('🔍 Datos de usuarios recibidos del backend:', usersData);
+            
+            // Debug: mostrar estructura del primer usuario
+            if (usersData.length > 0) {
+                console.log('📋 Estructura del primer usuario:', JSON.stringify(usersData[0], null, 2));
+            }
+            
             setUsers(usersData);
         } catch (error) {
             console.error('Error loading users:', error);
@@ -332,7 +339,31 @@ const UsersPage: React.FC = () => {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                {user.creado_at ? new Date(user.creado_at).toLocaleDateString('es-ES') : '-'}
+                                                {(() => {
+                                                    // Intentar diferentes nombres de campo de fecha
+                                                    const fechaRegistro = (user as any).creadoAt || 
+                                                                         user.creado_at || 
+                                                                         (user as any).createdAt || 
+                                                                         (user as any).created_at || 
+                                                                         (user as any).fechaRegistro ||
+                                                                         (user as any).fechaCreacion;
+                                                    
+                                                    if (!fechaRegistro) {
+                                                        console.log('⚠️ Usuario sin fecha de registro:', user);
+                                                        return '-';
+                                                    }
+                                                    
+                                                    try {
+                                                        return new Date(fechaRegistro).toLocaleDateString('es-ES', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric'
+                                                        });
+                                                    } catch (error) {
+                                                        console.error('Error formateando fecha:', fechaRegistro, error);
+                                                        return 'Fecha inválida';
+                                                    }
+                                                })()}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end space-x-2">

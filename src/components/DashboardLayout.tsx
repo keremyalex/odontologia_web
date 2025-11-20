@@ -6,7 +6,6 @@ import {
     UserGroupIcon,
     CalendarDaysIcon,
     UsersIcon,
-    Cog6ToothIcon,
     Bars3Icon,
     XMarkIcon,
     ArrowRightOnRectangleIcon,
@@ -37,7 +36,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         // { name: 'Turnos', href: '/appointments', icon: CalendarDaysIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
         { name: 'Citas Médicas', href: '/admin/citas', icon: CalendarDaysIcon, roles: ['admin', 'recepcion', 'docente'] },
         { name: 'Atenciones', href: '/atenciones', icon: DocumentTextIcon, roles: ['admin', 'estudiante', 'docente'] },
-        // { name: 'Configuración', href: '/settings', icon: Cog6ToothIcon, roles: ['admin'] },
     ];
 
     const filteredNavigation = navigation.filter(item =>

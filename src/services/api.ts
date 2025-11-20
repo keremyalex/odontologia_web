@@ -74,8 +74,30 @@ class ApiService {
     }
 
     async getUsers(): Promise<User[]> {
-        const response: AxiosResponse<User[]> = await this.api.get('/auth/users');
-        return response.data;
+        const response: AxiosResponse<any> = await this.api.get('/auth/users');
+        console.log('🔍 Respuesta getUsers del backend:', response.data);
+        
+        // El backend puede devolver {success: true, data: [...]} o directamente un array
+        let users = [];
+        if (response.data) {
+            if (response.data.success && Array.isArray(response.data.data)) {
+                users = response.data.data;
+            } else if (Array.isArray(response.data)) {
+                users = response.data;
+            }
+        }
+        
+        // Mapear y normalizar los datos de usuarios
+        const usuariosMapeados = users.map((user: any) => ({
+            id: user.id,
+            nombre: user.nombre || user.name || 'Sin nombre',
+            email: user.email,
+            rol: user.rol || user.role || 'estudiante',
+            creado_at: user.creadoAt || user.creado_at || user.createdAt || user.created_at || user.fechaRegistro || user.fechaCreacion
+        }));
+        
+        console.log('✅ Usuarios mapeados:', usuariosMapeados);
+        return usuariosMapeados;
     }
 
     // Métodos de pacientes

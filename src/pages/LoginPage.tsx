@@ -136,7 +136,7 @@ const LoginPage: React.FC = () => {
                             </Button>
                         </form>
 
-                        {/* Credenciales de prueba */}
+                        {/* Credenciales de prueba
                         <div className="mt-6">
                             <div className="relative">
                                 <div className="absolute inset-0 flex items-center">
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
                                 <p><strong>Recepción:</strong> maria.recepcion@clinica.edu / password123</p>
                                 <p><strong>Estudiante:</strong> juan.estudiante@clinica.edu / password123</p>
                             </div>
-                        </div>
+                        </div> */}
                     </CardContent>
                 </Card>
 

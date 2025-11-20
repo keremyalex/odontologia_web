@@ -23,7 +23,7 @@ export interface Atencion {
     planTratamiento: string;
     observaciones?: string;
     estadoBucalGeneral: EstadoBucalGeneral;
-    signosVitales: SignosVitales;
+    signosVitales?: SignosVitales; // Opcional porque el backend odontológico puede no enviarlo
     atendidoPor: number;
     fechaAtencion: string;
     actualizadoAt: string;
@@ -74,7 +74,7 @@ export interface CreateAtencionDto {
     planTratamiento: string;
     observaciones?: string;
     estadoBucalGeneral: EstadoBucalGeneral;
-    signosVitales: SignosVitales;
+    signosVitales?: SignosVitales; // Opcional para atenciones odontológicas
 }
 
 export interface UpdateAtencionDto {

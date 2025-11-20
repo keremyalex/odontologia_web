@@ -184,95 +184,114 @@ const DetalleAtencion: React.FC<DetalleAtencionProps> = ({ atencion, onClose }) 
                 </Card>
             </div>
 
-            {/* Signos Vitales */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-red-600" />
-                        Signos Vitales
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-red-100 rounded-lg">
-                                <Heart className="w-5 h-5 text-red-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium">Presión Arterial</p>
-                                <p className="text-lg font-semibold">{atencion.signosVitales.presionArterial}</p>
-                            </div>
+            {/* Signos Vitales (Solo si están disponibles) */}
+            {atencion.signosVitales && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-red-600" />
+                            Signos Vitales
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {atencion.signosVitales.presionArterial && (
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-red-100 rounded-lg">
+                                        <Heart className="w-5 h-5 text-red-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Presión Arterial</p>
+                                        <p className="text-lg font-semibold">{atencion.signosVitales.presionArterial}</p>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {atencion.signosVitales.temperatura && (
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-orange-100 rounded-lg">
+                                        <Thermometer className="w-5 h-5 text-orange-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Temperatura</p>
+                                        <p className="text-lg font-semibold">{atencion.signosVitales.temperatura}°C</p>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {atencion.signosVitales.frecuenciaCardiaca && (
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Activity className="w-5 h-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Frecuencia Cardíaca</p>
+                                        <p className="text-lg font-semibold">{atencion.signosVitales.frecuenciaCardiaca} bpm</p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-orange-100 rounded-lg">
-                                <Thermometer className="w-5 h-5 text-orange-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium">Temperatura</p>
-                                <p className="text-lg font-semibold">{atencion.signosVitales.temperatura}°C</p>
-                            </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <Activity className="w-5 h-5 text-blue-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium">Frecuencia Cardíaca</p>
-                                <p className="text-lg font-semibold">{atencion.signosVitales.frecuenciaCardiaca} bpm</p>
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Estado Bucal General */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Smile className="w-5 h-5 text-purple-600" />
-                        Estado Bucal General
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-2">
-                                {getEstadoIcon(atencion.estadoBucalGeneral.presenciaSarro)}
-                                <span className="text-sm font-medium">Presencia de Sarro</span>
+            {atencion.estadoBucalGeneral && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Smile className="w-5 h-5 text-purple-600" />
+                            Estado Bucal General
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="flex items-center justify-between p-3 border rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    {getEstadoIcon(atencion.estadoBucalGeneral.presenciaSarro || false)}
+                                    <span className="text-sm font-medium">Presencia de Sarro</span>
+                                </div>
+                                <span className="text-sm">{getEstadoText(atencion.estadoBucalGeneral.presenciaSarro || false)}</span>
                             </div>
-                            <span className="text-sm">{getEstadoText(atencion.estadoBucalGeneral.presenciaSarro)}</span>
+                            
+                            <div className="flex items-center justify-between p-3 border rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    {getEstadoIcon(atencion.estadoBucalGeneral.enfermedadPeriodontal || false)}
+                                    <span className="text-sm font-medium">Enf. Periodontal</span>
+                                </div>
+                                <span className="text-sm">{getEstadoText(atencion.estadoBucalGeneral.enfermedadPeriodontal || false)}</span>
+                            </div>
+                            
+                            {atencion.estadoBucalGeneral.presenciaCaries !== undefined && (
+                                <div className="flex items-center justify-between p-3 border rounded-lg">
+                                    <div className="flex items-center gap-2">
+                                        {getEstadoIcon(atencion.estadoBucalGeneral.presenciaCaries)}
+                                        <span className="text-sm font-medium">Presencia de Caries</span>
+                                    </div>
+                                    <span className="text-sm">{getEstadoText(atencion.estadoBucalGeneral.presenciaCaries)}</span>
+                                </div>
+                            )}
+                        
+                            <div className="flex items-center justify-between p-3 border rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    {getNivelIcon(atencion.estadoBucalGeneral.higieneBucal || 'bueno')}
+                                    <span className="text-sm font-medium">Higiene Bucal</span>
+                                </div>
+                                <Badge className={getNivelColor(atencion.estadoBucalGeneral.higieneBucal || 'bueno')}>
+                                    {getNivelText(atencion.estadoBucalGeneral.higieneBucal || 'bueno')}
+                                </Badge>
+                            </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-2">
-                                {getEstadoIcon(atencion.estadoBucalGeneral.enfermedadPeriodontal)}
-                                <span className="text-sm font-medium">Enf. Periodontal</span>
+                        {atencion.estadoBucalGeneral.otros && (
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                <p className="text-sm font-medium mb-2">Otras Observaciones</p>
+                                <p className="text-sm text-muted-foreground">{atencion.estadoBucalGeneral.otros}</p>
                             </div>
-                            <span className="text-sm">{getEstadoText(atencion.estadoBucalGeneral.enfermedadPeriodontal)}</span>
-                        </div>
-                        
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-2">
-                                {getEstadoIcon(atencion.estadoBucalGeneral.presenciaCaries)}
-                                <span className="text-sm font-medium">Presencia de Caries</span>
-                            </div>
-                            <span className="text-sm">{getEstadoText(atencion.estadoBucalGeneral.presenciaCaries)}</span>
-                        </div>
-                        
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="flex items-center gap-2">
-                                {getNivelIcon(atencion.estadoBucalGeneral.higieneBucal)}
-                                <span className="text-sm font-medium">Higiene Bucal</span>
-                            </div>
-                            <Badge className={getNivelColor(atencion.estadoBucalGeneral.higieneBucal)}>
-                                {getNivelText(atencion.estadoBucalGeneral.higieneBucal)}
-                            </Badge>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Diagnóstico y Tratamiento */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

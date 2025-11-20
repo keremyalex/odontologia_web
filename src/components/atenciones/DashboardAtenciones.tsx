@@ -56,12 +56,8 @@ const DashboardAtenciones: React.FC = () => {
                 apiService.getCitasPendientesAtencion()
             ]);
 
-            console.log('Respuesta atenciones:', atencionesResponse);
-            console.log('Respuesta citas:', citasResponse);
-
             if (atencionesResponse.success) {
                 const atenciones = atencionesResponse.data || [];
-                console.log('Atenciones procesadas:', atenciones, 'Es array:', Array.isArray(atenciones));
                 processEstadisticas(atenciones);
                 setAtencionesRecientes(Array.isArray(atenciones) ? atenciones.slice(0, 5) : []);
             } else {
@@ -71,7 +67,11 @@ const DashboardAtenciones: React.FC = () => {
             }
 
             if (citasResponse.success) {
-                setCitasPendientes(Array.isArray(citasResponse.data) ? citasResponse.data : []);
+                const citas = Array.isArray(citasResponse.data) ? citasResponse.data : [];
+                setCitasPendientes(citas);
+                
+                // Actualizar las estadísticas con el número de citas pendientes
+                setEstadisticas(prev => prev ? {...prev, citasPendientes: citas.length} : null);
             } else {
                 console.error('Error en respuesta de citas:', citasResponse.error);
                 setCitasPendientes([]);
@@ -102,57 +102,61 @@ const DashboardAtenciones: React.FC = () => {
                 especialidadesActivas: 0,
                 promedioAtencionesDiarias: 0
             });
+            setAtencionesPorEspecialidad([]);
             return;
         }
 
+        // Filtrar atenciones válidas
+        const atencionesValidas = atenciones.filter(a => a && a.fechaAtencion);
+        
         const ahora = new Date();
         const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
         const semanaAtras = new Date(hoy.getTime() - 7 * 24 * 60 * 60 * 1000);
         const mesAtras = new Date(hoy.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-        const atencionesHoy = atenciones.filter(a => {
+        const atencionesHoy = atencionesValidas.filter(a => {
             const fechaAtencion = new Date(a.fechaAtencion);
-            return fechaAtencion >= hoy;
+            return fechaAtencion >= hoy && fechaAtencion < new Date(hoy.getTime() + 24 * 60 * 60 * 1000);
         }).length;
 
-        const atencionesSemana = atenciones.filter(a => {
+        const atencionesSemana = atencionesValidas.filter(a => {
             const fechaAtencion = new Date(a.fechaAtencion);
             return fechaAtencion >= semanaAtras;
         }).length;
 
-        const atencionesMes = atenciones.filter(a => {
+        const atencionesMes = atencionesValidas.filter(a => {
             const fechaAtencion = new Date(a.fechaAtencion);
             return fechaAtencion >= mesAtras;
         }).length;
 
         // Calcular estadísticas por especialidad
         const especialidadCount: { [key: string]: number } = {};
-        atenciones.forEach(a => {
-            const especialidad = a.cita?.franja?.especialidad?.nombre;
-            if (especialidad) {
-                especialidadCount[especialidad] = (especialidadCount[especialidad] || 0) + 1;
-            }
+        atencionesValidas.forEach(a => {
+            const especialidad = a.cita?.franja?.especialidad?.nombre || 'No especificada';
+            especialidadCount[especialidad] = (especialidadCount[especialidad] || 0) + 1;
         });
 
         const especialidadesStats = Object.entries(especialidadCount)
             .map(([especialidad, cantidad]) => ({
                 especialidad,
                 cantidad,
-                porcentaje: (cantidad / atenciones.length) * 100
+                porcentaje: atencionesValidas.length > 0 ? (cantidad / atencionesValidas.length) * 100 : 0
             }))
             .sort((a, b) => b.cantidad - a.cantidad);
 
         setAtencionesPorEspecialidad(especialidadesStats);
 
-        setEstadisticas({
-            totalAtenciones: atenciones.length,
+        const estadisticasCalculadas = {
+            totalAtenciones: atencionesValidas.length,
             atencionesHoy,
             atencionesSemana,
             atencionesMes,
             citasPendientes: 0, // Se actualizará con las citas pendientes
-            especialidadesActivas: new Set(atenciones.filter(a => a.cita?.franja?.especialidad).map(a => a.cita!.franja!.especialidad!.id)).size,
+            especialidadesActivas: Object.keys(especialidadCount).length,
             promedioAtencionesDiarias: atencionesMes > 0 ? Math.round(atencionesMes / 30 * 10) / 10 : 0
-        });
+        };
+
+        setEstadisticas(estadisticasCalculadas);
     };
 
     const formatearFecha = (fecha: string) => {
@@ -189,37 +193,6 @@ const DashboardAtenciones: React.FC = () => {
                 <Button onClick={loadDashboardData} variant="outline" disabled={loading}>
                     <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                     Actualizar
-                </Button>
-                
-                {/* Botón de debug temporal */}
-                <Button 
-                    onClick={async () => {
-                        console.log('=== DEBUG DASHBOARD API ===');
-                        try {
-                            // Probar endpoint de atenciones directamente
-                            const directResponse = await fetch('/api/atenciones', {
-                                headers: { 
-                                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            console.log('Response atenciones directa:', directResponse.status, directResponse.statusText);
-                            if (directResponse.ok) {
-                                const data = await directResponse.json();
-                                console.log('Datos atenciones directa:', data);
-                                console.log('Es array:', Array.isArray(data));
-                            } else {
-                                const errorText = await directResponse.text();
-                                console.error('Error response:', errorText);
-                            }
-                        } catch (err) {
-                            console.error('Error al probar API directa:', err);
-                        }
-                    }}
-                    variant="secondary"
-                    size="sm"
-                >
-                    🔍 Debug
                 </Button>
             </div>
 
@@ -412,13 +385,29 @@ const DashboardAtenciones: React.FC = () => {
                             Tienes <strong>{citasPendientes.length}</strong> cita{citasPendientes.length !== 1 ? 's' : ''} pendiente{citasPendientes.length !== 1 ? 's' : ''} de atención.
                         </p>
                         <div className="space-y-2">
-                            {citasPendientes.slice(0, 3).map((cita) => (
-                                <div key={cita.id} className="text-sm text-orange-700">
-                                    • <strong>{cita.paciente.nombres} {cita.paciente.apellidos}</strong> - 
-                                    {cita.franja.especialidad.nombre} - 
-                                    {new Date(cita.fecha).toLocaleDateString()} {cita.horaInicio}
-                                </div>
-                            ))}
+                            {citasPendientes.slice(0, 3).map((cita) => {
+                                // Manejo seguro de datos que pueden estar undefined
+                                const nombrePaciente = cita.paciente?.nombres || 'Sin nombre';
+                                const apellidoPaciente = cita.paciente?.apellidos || 'Sin apellido';
+                                const especialidad = cita.franja?.especialidad?.nombre || 'No especificada';
+                                const fecha = cita.fecha ? new Date(cita.fecha).toLocaleDateString('es-ES') : 'Fecha no definida';
+                                const hora = cita.horaInicio || 'Hora no definida';
+                                const responsable = cita.franja?.responsable ? 
+                                    `${cita.franja.responsable.nombres || ''} ${cita.franja.responsable.apellidos || ''}`.trim() || 'N/A' : 'N/A';
+                                
+                                return (
+                                    <div key={cita.id} className="text-sm text-orange-700 bg-orange-100 p-2 rounded">
+                                        <div className="font-medium">
+                                            <strong>{nombrePaciente} {apellidoPaciente}</strong>
+                                            {cita.paciente?.ci && <span className="text-orange-600"> (CI: {cita.paciente.ci})</span>}
+                                        </div>
+                                        <div className="text-xs text-orange-600 mt-1">
+                                            {especialidad} • {fecha} {hora}
+                                            {responsable !== 'N/A' && <span> • Dr/a. {responsable}</span>}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                             {citasPendientes.length > 3 && (
                                 <div className="text-sm text-orange-600">
                                     ... y {citasPendientes.length - 3} más

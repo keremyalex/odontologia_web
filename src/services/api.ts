@@ -356,14 +356,116 @@ class ApiService {
     // Obtener todas las atenciones
     async getAtenciones(): Promise<any> {
         try {
-            const response = await this.api.get('/atenciones');
-            console.log('getAtenciones - Respuesta completa:', response);
-            console.log('getAtenciones - Datos:', response.data);
-            console.log('getAtenciones - Es array:', Array.isArray(response.data));
+            // Intentar primero con populate
+            let response;
+            try {
+                response = await this.api.get('/atenciones?populate=true');
+            } catch (populateError) {
+                // Si falla, intentar con include
+                try {
+                    response = await this.api.get('/atenciones?include=cita,paciente,franja,especialidad,responsable');
+                } catch (includeError) {
+                    // Si falla, usar el endpoint básico
+                    response = await this.api.get('/atenciones');
+                }
+            }
+            
+            console.log('getAtenciones - Respuesta completa:', response.data);
+            
+            // El backend devuelve {success: true, data: [...]} o directamente un array
+            let atenciones = [];
+            if (response.data) {
+                if (response.data.success && Array.isArray(response.data.data)) {
+                    atenciones = response.data.data;
+                } else if (Array.isArray(response.data)) {
+                    atenciones = response.data;
+                }
+            }
+            
+            // Debug: Verificar estructura de datos
+            if (atenciones.length > 0) {
+                console.log('Primera atención para debug:', JSON.stringify(atenciones[0], null, 2));
+                if (atenciones[0].cita) {
+                    console.log('Estructura de cita:', JSON.stringify(atenciones[0].cita, null, 2));
+                    if (atenciones[0].cita.franja) {
+                        console.log('Estructura de franja:', JSON.stringify(atenciones[0].cita.franja, null, 2));
+                    }
+                }
+            }
+            
+            // Obtener solo especialidades para mapear correctamente
+            let especialidades: any[] = [];
+            
+            try {
+                especialidades = await this.getEspecialidades();
+            } catch (error) {
+                console.log('No se pudieron obtener especialidades para mapeo');
+            }
+            
+            // Mapear y normalizar los datos para consistencia
+            const atencionesMapeadas = atenciones.map((atencion: any) => {
+                let especialidad = null;
+                
+                // Buscar especialidad - manejar diferentes estructuras de datos
+                let especialidadId = null;
+                
+                // Intentar obtener el ID de especialidad de diferentes lugares
+                if (atencion.cita?.franja?.especialidadId) {
+                    especialidadId = atencion.cita.franja.especialidadId;
+                } else if (atencion.cita?.franja?.especialidad?.id) {
+                    especialidadId = atencion.cita.franja.especialidad.id;
+                } else if (atencion.cita?.especialidadId) {
+                    especialidadId = atencion.cita.especialidadId;
+                }
+                
+                // Si ya existe el objeto especialidad completo, usarlo
+                if (atencion.cita?.franja?.especialidad?.nombre) {
+                    especialidad = atencion.cita.franja.especialidad;
+                } else if (especialidadId && especialidades.length > 0) {
+                    // Buscar en la lista de especialidades obtenida
+                    especialidad = especialidades.find((esp: any) => esp.id === especialidadId) || {
+                        id: especialidadId,
+                        nombre: 'Especialidad no disponible'
+                    };
+                }
+
+                return {
+                    ...atencion,
+                    cita: atencion.cita ? {
+                        ...atencion.cita,
+                        paciente: atencion.cita.paciente ? {
+                            ...atencion.cita.paciente,
+                            // Normalizar campos de nombre (el backend usa singular, el frontend espera plural)
+                            nombres: atencion.cita.paciente.nombre || atencion.cita.paciente.nombres,
+                            apellidos: atencion.cita.paciente.apellido || atencion.cita.paciente.apellidos
+                        } : null,
+                        franja: atencion.cita.franja ? {
+                            ...atencion.cita.franja,
+                            especialidad,
+                            // Para el responsable, usar los datos de atencionPor como fallback
+                            responsable: atencion.atencionPor ? {
+                                id: atencion.atencionPor.id,
+                                nombres: atencion.atencionPor.nombre || atencion.atencionPor.nombres,
+                                apellidos: atencion.atencionPor.apellido || atencion.atencionPor.apellidos || ''
+                            } : {
+                                id: atencion.cita.franja.responsableId || 0,
+                                nombres: 'Responsable',
+                                apellidos: 'no disponible'
+                            }
+                        } : null
+                    } : null,
+                    // Normalizar el campo atencionPor también
+                    atencionPor: atencion.atencionPor ? {
+                        ...atencion.atencionPor,
+                        nombres: atencion.atencionPor.nombre || atencion.atencionPor.nombres,
+                        apellidos: atencion.atencionPor.apellido || atencion.atencionPor.apellidos || ''
+                    } : null
+                };
+            });
             
             return {
                 success: true,
-                data: Array.isArray(response.data) ? response.data : []
+                data: atencionesMapeadas
             };
         } catch (error: any) {
             console.error('Error al obtener atenciones:', error);
@@ -435,8 +537,31 @@ class ApiService {
 
     // Obtener atenciones por paciente
     async getAtencionesPorPaciente(pacienteId: number): Promise<any> {
-        const response = await this.api.get(`/atenciones/paciente/${pacienteId}`);
-        return response.data;
+        console.log('📤 Solicitando atenciones para paciente ID:', pacienteId);
+        
+        try {
+            const response = await this.api.get(`/atenciones/paciente/${pacienteId}`);
+            console.log('✅ Respuesta del backend - atenciones por paciente:');
+            console.log('Status:', response.status);
+            console.log('Data:', JSON.stringify(response.data, null, 2));
+            console.log('Tipo de data:', typeof response.data);
+            console.log('Es array:', Array.isArray(response.data));
+            
+            // El backend devuelve { success: true, data: [...] }
+            // Necesitamos extraer solo el array 'data'
+            if (response.data && response.data.success && response.data.data) {
+                console.log('🔄 Extrayendo array de datos:', response.data.data);
+                return response.data.data;
+            }
+            
+            // Fallback si el formato es diferente
+            return Array.isArray(response.data) ? response.data : [];
+        } catch (error: any) {
+            console.error('❌ Error al obtener atenciones por paciente:');
+            console.error('Status:', error.response?.status);
+            console.error('Error Data:', error.response?.data);
+            throw error;
+        }
     }
 
     // Obtener atenciones por historia clínica
@@ -468,9 +593,45 @@ class ApiService {
         try {
             // Intentar primero con el endpoint específico
             const response = await this.api.get('/citas/pendientes-atencion');
+            console.log('Respuesta citas pendientes:', response.data);
+            
+            // Extraer datos según la estructura del backend
+            let citas = [];
+            if (response.data) {
+                if (response.data.success && Array.isArray(response.data.data)) {
+                    citas = response.data.data;
+                } else if (Array.isArray(response.data)) {
+                    citas = response.data;
+                }
+            }
+            
+            // Mapear los datos para asegurar consistencia
+            const citasMapeadas = citas.map((cita: any) => ({
+                ...cita,
+                paciente: {
+                    ...cita.paciente,
+                    nombres: cita.paciente?.nombres || cita.paciente?.nombre || 'Sin nombre',
+                    apellidos: cita.paciente?.apellidos || cita.paciente?.apellido || 'Sin apellido',
+                    ci: cita.paciente?.ci || cita.paciente?.cedula || '',
+                    telefono: cita.paciente?.telefono || ''
+                },
+                franja: {
+                    ...cita.franja,
+                    especialidad: {
+                        ...cita.franja?.especialidad,
+                        nombre: cita.franja?.especialidad?.nombre || 'No especificada'
+                    },
+                    responsable: {
+                        ...cita.franja?.responsable,
+                        nombres: cita.franja?.responsable?.nombres || cita.franja?.responsable?.nombre || 'N/A',
+                        apellidos: cita.franja?.responsable?.apellidos || cita.franja?.responsable?.apellido || ''
+                    }
+                }
+            }));
+            
             return {
                 success: true,
-                data: response.data
+                data: citasMapeadas
             };
         } catch (error: any) {
             // Si falla, usar el endpoint de citas con filtro de estado
@@ -480,13 +641,39 @@ class ApiService {
                     params: { estado: 'programada' }
                 });
                 
+                console.log('Respuesta citas con filtro:', response.data);
+                
+                // Extraer datos según la estructura del backend
+                let citas = [];
+                if (response.data) {
+                    if (response.data.success && Array.isArray(response.data.data)) {
+                        citas = response.data.data;
+                    } else if (Array.isArray(response.data)) {
+                        citas = response.data;
+                    }
+                }
+                
                 // Mapear los datos al formato esperado por CitaPendienteAtencion
-                const citasMapeadas = response.data.map((cita: any) => ({
+                const citasMapeadas = citas.map((cita: any) => ({
                     ...cita,
                     paciente: {
                         ...cita.paciente,
-                        nombres: cita.paciente.nombre || cita.paciente.nombres,
-                        apellidos: cita.paciente.apellido || cita.paciente.apellidos
+                        nombres: cita.paciente?.nombres || cita.paciente?.nombre || 'Sin nombre',
+                        apellidos: cita.paciente?.apellidos || cita.paciente?.apellido || 'Sin apellido',
+                        ci: cita.paciente?.ci || cita.paciente?.cedula || '',
+                        telefono: cita.paciente?.telefono || ''
+                    },
+                    franja: {
+                        ...cita.franja,
+                        especialidad: {
+                            ...cita.franja?.especialidad,
+                            nombre: cita.franja?.especialidad?.nombre || 'No especificada'
+                        },
+                        responsable: {
+                            ...cita.franja?.responsable,
+                            nombres: cita.franja?.responsable?.nombres || cita.franja?.responsable?.nombre || 'N/A',
+                            apellidos: cita.franja?.responsable?.apellidos || cita.franja?.responsable?.apellido || ''
+                        }
                     }
                 }));
                 
@@ -495,34 +682,12 @@ class ApiService {
                     data: citasMapeadas
                 };
             } catch (fallbackError: any) {
-                // Intentar con estado en mayúsculas
-                try {
-                    const response = await this.api.get('/citas', {
-                        params: { estado: 'PROGRAMADA' }
-                    });
-                    
-                    // Mapear los datos al formato esperado
-                    const citasMapeadas = response.data.map((cita: any) => ({
-                        ...cita,
-                        paciente: {
-                            ...cita.paciente,
-                            nombres: cita.paciente.nombre || cita.paciente.nombres,
-                            apellidos: cita.paciente.apellido || cita.paciente.apellidos
-                        }
-                    }));
-                    
-                    return {
-                        success: true,
-                        data: citasMapeadas
-                    };
-                } catch (finalError: any) {
-                    console.error('Error al obtener citas pendientes:', finalError);
-                    return {
-                        success: false,
-                        error: finalError.response?.data?.message || 'Error al cargar citas pendientes',
-                        data: []
-                    };
-                }
+                console.error('Error al cargar citas pendientes:', fallbackError);
+                return {
+                    success: false,
+                    error: fallbackError.response?.data?.message || 'Error al cargar citas pendientes',
+                    data: []
+                };
             }
         }
     }

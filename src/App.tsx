@@ -13,6 +13,7 @@ import CuestionarioPage from './pages/CuestionarioPage';
 import CuestionarioCompletePage from './pages/CuestionarioCompletePage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import AtencionesPage from './pages/AtencionesPage';
+import HistorialAtencionesPage from './pages/HistorialAtencionesPage';
 import UsersPage from './pages/UsersPage';
 import UserFormPage from './pages/UserFormPage';
 
@@ -88,6 +89,14 @@ function App() {
               element={
                 <ProtectedRoute requiredRoles={['admin', 'recepcion', 'estudiante', 'docente']}>
                   <CuestionarioCompletePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/patients/:id/atenciones"
+              element={
+                <ProtectedRoute requiredRoles={['admin', 'recepcion', 'estudiante', 'docente']}>
+                  <HistorialAtencionesPage />
                 </ProtectedRoute>
               }
             />

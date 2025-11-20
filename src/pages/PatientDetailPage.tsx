@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
     ArrowLeft,
     Edit,
     FileText,
@@ -14,7 +22,10 @@ import {
     User,
     MapPin,
     Clock,
-    Plus
+    Plus,
+    Stethoscope,
+    Eye,
+    Activity
 } from 'lucide-react';
 import apiService from '@/services/api';
 import type { Paciente, HistoriaClinica } from '@/types';
@@ -25,6 +36,8 @@ const PatientDetailPage: React.FC = () => {
 
     const [paciente, setPaciente] = useState<Paciente | null>(null);
     const [historias, setHistorias] = useState<HistoriaClinica[]>([]);
+    const [atenciones, setAtenciones] = useState<any[]>([]);
+    const [citas, setCitas] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>('');
 
@@ -49,6 +62,32 @@ const PatientDetailPage: React.FC = () => {
             } catch (err) {
                 // No hay historias clínicas, esto es normal
                 setHistorias([]);
+            }
+
+            // Cargar historial de atenciones
+            try {
+                const atencionesData = await apiService.getAtencionesPorPaciente(pacienteId);
+                console.log('🔍 Atenciones cargadas en PatientDetailPage:', atencionesData);
+                console.log('🔍 Es array en PatientDetailPage:', Array.isArray(atencionesData));
+                setAtenciones(Array.isArray(atencionesData) ? atencionesData : []);
+            } catch (err) {
+                console.log('ℹ️ No hay atenciones o error al cargar:', err);
+                setAtenciones([]);
+            }
+
+            // Cargar citas del paciente
+            try {
+                const citasData = await apiService.getCitasPorPaciente(pacienteId);
+                console.log('📅 Citas cargadas en PatientDetailPage:', citasData);
+                console.log('📅 Es array las citas:', Array.isArray(citasData));
+                
+                // Filtrar citas programadas
+                const citasProgramadas = Array.isArray(citasData) ? 
+                    citasData.filter(cita => cita.estado === 'programada') : [];
+                setCitas(citasProgramadas);
+            } catch (err) {
+                console.log('ℹ️ No hay citas o error al cargar:', err);
+                setCitas([]);
             }
 
         } catch (err: any) {
@@ -290,6 +329,20 @@ const PatientDetailPage: React.FC = () => {
                                     </div>
 
                                     <div className="flex justify-between items-center">
+                                        <span className="text-sm font-medium">Citas Programadas:</span>
+                                        <Badge variant={citas.length > 0 ? "default" : "secondary"}>
+                                            {citas.length} pendientes
+                                        </Badge>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm font-medium">Atenciones:</span>
+                                        <Badge variant={atenciones.length > 0 ? "default" : "secondary"}>
+                                            {atenciones.length} registradas
+                                        </Badge>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
                                         <span className="text-sm font-medium">Registro:</span>
                                         <span className="text-sm text-gray-600">
                                             {formatDate(paciente.fechaRegistro)}
@@ -361,50 +414,224 @@ const PatientDetailPage: React.FC = () => {
                                 )}
                             </CardContent>
                         </Card>
-
-                        {/* Acciones Rápidas */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Acciones Rápidas</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full justify-start"
-                                >
-                                    <Link to={`/patients/${paciente.id}/edit`}>
-                                        <Edit className="mr-2 h-4 w-4" />
-                                        Editar Información
-                                    </Link>
-                                </Button>
-
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full justify-start"
-                                >
-                                    <Link to={`/appointments/new?pacienteId=${paciente.id}`}>
-                                        <Calendar className="mr-2 h-4 w-4" />
-                                        Agendar Cita
-                                    </Link>
-                                </Button>
-
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className="w-full justify-start"
-                                >
-                                    <Link to={`/patients/${paciente.id}/historia-completa`}>
-                                        <FileText className="mr-2 h-4 w-4" />
-                                        {historias.length > 0 ? 'Actualizar Historia' : 'Crear Historia'}
-                                    </Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
                     </div>
+                </div>
+                
+                {/* Sección de Tablas - Área Principal */}
+                <div className="space-y-6">
+                    {/* Tabla de Citas Programadas */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                                <span className="flex items-center">
+                                    <Calendar className="mr-2 h-5 w-5" />
+                                    Citas Programadas
+                                </span>
+                                <Badge variant="outline">
+                                    {citas.length} citas
+                                </Badge>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {citas.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                        No hay citas programadas
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Este paciente no tiene citas programadas.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-[120px]">Fecha</TableHead>
+                                                <TableHead className="w-[100px]">Hora</TableHead>
+                                                <TableHead>Motivo de Consulta</TableHead>
+                                                <TableHead>Observaciones</TableHead>
+                                                <TableHead className="w-[100px]">Estado</TableHead>
+                                                <TableHead className="w-20">Acciones</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {citas.map((cita, index) => {
+                                                if (!cita) return null;
+
+                                                return (
+                                                    <TableRow key={cita.id || index} className="hover:bg-gray-50">
+                                                        <TableCell className="font-medium">
+                                                            {cita.fecha ? new Date(cita.fecha).toLocaleDateString('es-ES', {
+                                                                year: 'numeric',
+                                                                month: '2-digit',
+                                                                day: '2-digit'
+                                                            }) : 'N/A'}
+                                                        </TableCell>
+                                                        
+                                                        <TableCell>
+                                                            <span className="text-sm">
+                                                                {cita.horaInicio || cita.hora_inicio} - {cita.horaFin || cita.hora_fin}
+                                                            </span>
+                                                        </TableCell>
+                                                        
+                                                        <TableCell>
+                                                            <div className="max-w-xs">
+                                                                <span className="text-sm truncate block">
+                                                                    {cita.motivoConsulta || cita.motivo_consulta || 'No especificado'}
+                                                                </span>
+                                                            </div>
+                                                        </TableCell>
+                                                        
+                                                        <TableCell>
+                                                            <div className="max-w-xs">
+                                                                <span className="text-sm truncate block text-gray-600">
+                                                                    {cita.observaciones || 'Sin observaciones'}
+                                                                </span>
+                                                            </div>
+                                                        </TableCell>
+                                                        
+                                                        <TableCell>
+                                                            <Badge variant="default" className="bg-blue-100 text-blue-800">
+                                                                Programada
+                                                            </Badge>
+                                                        </TableCell>
+                                                        
+                                                        <TableCell>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <Eye className="h-3 w-3" />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            }).filter(Boolean)}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Tabla de Historial de Atenciones */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                                <span className="flex items-center">
+                                    <Stethoscope className="mr-2 h-5 w-5" />
+                                    Historial de Atenciones Médicas
+                                </span>
+                                <Badge variant="outline">
+                                    {atenciones.length} atenciones
+                                </Badge>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {atenciones.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <Activity className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                        No hay atenciones registradas
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Este paciente no tiene atenciones médicas registradas.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="overflow-x-auto">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[120px]">Fecha</TableHead>
+                                                    <TableHead>Diagnóstico</TableHead>
+                                                    <TableHead>Plan de Tratamiento</TableHead>
+                                                    <TableHead>Observaciones</TableHead>
+                                                    <TableHead className="w-[140px]">Responsable</TableHead>
+                                                    <TableHead className="w-20">Acciones</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {atenciones.map((atencion, index) => {
+                                                    if (!atencion) return null;
+
+                                                    const fechaAtencion = atencion.fechaAtencion || atencion.createdAt;
+                                                    const atencionPor = atencion.atencionPor || atencion.atendidoPor || {};
+
+                                                    return (
+                                                        <TableRow key={atencion.id || index} className="hover:bg-gray-50">
+                                                            <TableCell className="font-medium">
+                                                                {fechaAtencion ? new Date(fechaAtencion).toLocaleDateString('es-ES', {
+                                                                    year: '2-digit',
+                                                                    month: '2-digit',
+                                                                    day: '2-digit'
+                                                                }) : 'N/A'}
+                                                            </TableCell>
+                                                            
+                                                            <TableCell>
+                                                                <div className="max-w-xs">
+                                                                    <span className="text-sm truncate block">
+                                                                        {atencion.diagnosticoPresuntivo || 'No especificado'}
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+                                                            
+                                                            <TableCell>
+                                                                <div className="max-w-xs">
+                                                                    <span className="text-sm truncate block">
+                                                                        {atencion.planTratamiento || 'No especificado'}
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+                                                            
+                                                            <TableCell>
+                                                                <div className="max-w-xs">
+                                                                    <span className="text-sm truncate block text-gray-600">
+                                                                        {atencion.observaciones || 'Sin observaciones'}
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+                                                            
+                                                            <TableCell>
+                                                                <span className="text-sm">
+                                                                    {atencionPor.nombre || atencionPor.nombres || 'N/A'}
+                                                                </span>
+                                                            </TableCell>
+                                                            
+                                                            <TableCell>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    onClick={() => navigate(`/patients/${paciente.id}/atenciones`)}
+                                                                >
+                                                                    <Eye className="h-3 w-3" />
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                }).filter(Boolean)}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                    
+                                    {atenciones.length > 10 && (
+                                        <div className="text-center pt-3 border-t border-gray-200">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => navigate(`/patients/${paciente.id}/atenciones`)}
+                                            >
+                                                Ver historial completo ({atenciones.length} atenciones)
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </DashboardLayout>

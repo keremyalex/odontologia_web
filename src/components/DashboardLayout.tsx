@@ -11,6 +11,8 @@ import {
     XMarkIcon,
     ArrowRightOnRectangleIcon,
     HeartIcon,
+    ClockIcon,
+    AcademicCapIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 
@@ -28,7 +30,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
         { name: 'Pacientes', href: '/patients', icon: UserGroupIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
         { name: 'Turnos', href: '/appointments', icon: CalendarDaysIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
+        { name: 'Citas Médicas', href: '/admin/citas', icon: CalendarDaysIcon, roles: ['admin', 'recepcion', 'docente'] },
         { name: 'Usuarios', href: '/users', icon: UsersIcon, roles: ['admin'] },
+        { name: 'Especialidades', href: '/admin/especialidades', icon: AcademicCapIcon, roles: ['admin'] },
+        { name: 'Horarios Clínica', href: '/admin/horarios-clinica', icon: ClockIcon, roles: ['admin'] },
+        { name: 'Franjas Horarias', href: '/admin/franjas-horarias', icon: CalendarDaysIcon, roles: ['admin', 'docente'] },
         { name: 'Configuración', href: '/settings', icon: Cog6ToothIcon, roles: ['admin'] },
     ];
 

@@ -15,6 +15,12 @@ import AppointmentsPage from './pages/AppointmentsPage';
 import UsersPage from './pages/UsersPage';
 import UserFormPage from './pages/UserFormPage';
 
+// Admin Pages
+import EspecialidadesPage from './pages/admin/EspecialidadesPage';
+import HorariosClinicaPage from './pages/admin/HorariosClinicaPage';
+import FranjasHorariasPage from './pages/admin/FranjasHorariasPage';
+import CitasPage from './pages/admin/CitasPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -117,6 +123,40 @@ function App() {
               element={
                 <ProtectedRoute requiredRoles={['admin']}>
                   <UserFormPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin routes */}
+            <Route
+              path="/admin/especialidades"
+              element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <EspecialidadesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/horarios-clinica"
+              element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <HorariosClinicaPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/franjas-horarias"
+              element={
+                <ProtectedRoute requiredRoles={['admin', 'docente']}>
+                  <FranjasHorariasPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/citas"
+              element={
+                <ProtectedRoute requiredRoles={['admin', 'recepcion', 'docente']}>
+                  <CitasPage />
                 </ProtectedRoute>
               }
             />

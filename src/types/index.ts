@@ -207,6 +207,7 @@ export interface HistoriaClinica {
     pacienteId: number;
     cuestionario: CuestionarioCompleto | CuestionarioWrapper | string;
     cuestionarioOdontologico?: CuestionarioOdontologico | string; // camelCase como espera el backend
+    odontograma?: any; // Campo para el odontograma
     fecha?: string;
     profesionalId?: number;
     observaciones?: string;
@@ -218,3 +219,123 @@ export interface ApiError {
     message: string;
     statusCode: number;
 }
+
+// Interfaces para Sistema de Especialidades y Horarios
+
+export interface Especialidad {
+    id: number;
+    nombre: string;
+    descripcion?: string;
+    activo?: boolean; // Opcional porque el backend puede no incluirlo
+    created_at?: string;
+    updated_at?: string;
+    createdAt?: string; // Para compatibilidad con el backend
+    updatedAt?: string; // Para compatibilidad con el backend
+    franjasHorarias?: FranjaHoraria[];
+}
+
+export interface CreateEspecialidadDto {
+    nombre: string;
+    descripcion?: string;
+    activo?: boolean;
+}
+
+export interface UpdateEspecialidadDto {
+    nombre?: string;
+    descripcion?: string;
+    activo?: boolean;
+}
+
+export interface HorarioClinica {
+    id: number;
+    diasSemana: number[]; // Array de días [1,2,3,4,5] (1=Lunes, 7=Domingo)
+    horaApertura: string; // Formato "HH:MM"
+    horaCierre: string; // Formato "HH:MM"
+    activo: boolean;
+    descripcion?: string;
+    created_at?: string;
+    createdAt?: string; // Compatibilidad con backend
+    updated_at?: string;
+    updatedAt?: string; // Compatibilidad con backend
+}
+
+export interface CreateHorarioClinicaDto {
+    diasSemana: number[];
+    horaApertura: string;
+    horaCierre: string;
+    activo?: boolean;
+    descripcion?: string;
+}
+
+export interface UpdateHorarioClinicaDto {
+    diasSemana?: number[];
+    horaApertura?: string;
+    horaCierre?: string;
+    activo?: boolean;
+    descripcion?: string;
+}
+
+export interface FranjaHoraria {
+    id: number;
+    diaSemana: number; // Día específico (1-7)
+    especialidadId: number;
+    responsableId: number;
+    horaInicio: string; // Formato "HH:MM"
+    horaFin: string; // Formato "HH:MM"
+    duracionCitaMin: number; // default: 30
+    cuposMaximos?: number; // Límite manual opcional
+    cuposCalculados: number; // Calculado automáticamente
+    estado: 'activo' | 'inactivo' | 'suspendido';
+    observaciones?: string;
+    created_at?: string;
+    updated_at?: string;
+    especialidad?: Especialidad;
+    responsable?: User;
+}
+
+export interface CreateFranjaHorariaDto {
+    diaSemana: number;
+    especialidadId: number;
+    responsableId: number;
+    horaInicio: string;
+    horaFin: string;
+    duracionCitaMin?: number;
+    cuposMaximos?: number; // Límite manual opcional
+    estado?: 'activo' | 'inactivo' | 'suspendido';
+    observaciones?: string;
+}
+
+export interface UpdateFranjaHorariaDto {
+    diaSemana?: number;
+    especialidadId?: number;
+    responsableId?: number;
+    horaInicio?: string;
+    horaFin?: string;
+    duracionCitaMin?: number;
+    cuposMaximos?: number; // Límite manual opcional
+    estado?: 'activo' | 'inactivo' | 'suspendido';
+    observaciones?: string;
+}
+
+export interface FranjaHorariaFilters {
+    dia?: number;
+    especialidad?: number;
+    responsable?: number;
+}
+
+// Constantes para días de la semana
+export const DIAS_SEMANA = {
+    1: 'Lunes',
+    2: 'Martes', 
+    3: 'Miércoles',
+    4: 'Jueves',
+    5: 'Viernes',
+    6: 'Sábado',
+    7: 'Domingo'
+} as const;
+
+export const ESTADOS_FRANJA = {
+    activo: 'Activo',
+    inactivo: 'Inactivo', 
+    suspendido: 'Suspendido'
+} as const;

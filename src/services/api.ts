@@ -7,10 +7,21 @@ import type {
     RegisterRequest,
     Paciente,
     Turno,
-    HistoriaClinica
+    HistoriaClinica,
+    Especialidad
 } from '@/types';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+import type {
+    Cita,
+    CrearCitaDto,
+    UpdateCitaDto,
+    ReagendarCitaDto,
+    CambiarEstadoCitaDto,
+    FiltrosCitas,
+    DisponibilidadResponse
+} from '@/types/citas';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 class ApiService {
     private api: AxiosInstance;
@@ -146,6 +157,171 @@ class ApiService {
 
     async updateHistoriaClinica(id: number, data: Partial<HistoriaClinica>): Promise<HistoriaClinica> {
         const response: AxiosResponse<HistoriaClinica> = await this.api.patch(`/historias/${id}`, data);
+        return response.data;
+    }
+
+    // Métodos de especialidades
+    async getEspecialidades(): Promise<Especialidad[]> {
+        const response = await this.api.get('/especialidades');
+        return response.data;
+    }
+
+    async getEspecialidad(id: number): Promise<any> {
+        const response = await this.api.get(`/especialidades/${id}`);
+        return response.data;
+    }
+
+    async createEspecialidad(data: any): Promise<any> {
+        const response = await this.api.post('/especialidades', data);
+        return response.data;
+    }
+
+    async updateEspecialidad(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/especialidades/${id}`, data);
+        return response.data;
+    }
+
+    async deleteEspecialidad(id: number): Promise<void> {
+        await this.api.delete(`/especialidades/${id}`);
+    }
+
+    // Métodos de horarios de clínica
+    async getHorariosClinica(): Promise<any[]> {
+        const response = await this.api.get('/horarios/clinica');
+        return response.data;
+    }
+
+    async getHorarioClinica(id: number): Promise<any> {
+        const response = await this.api.get(`/horarios/clinica/${id}`);
+        return response.data;
+    }
+
+    async createHorarioClinica(data: any): Promise<any> {
+        const response = await this.api.post('/horarios/clinica', data);
+        return response.data;
+    }
+
+    async updateHorarioClinica(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/horarios/clinica/${id}`, data);
+        return response.data;
+    }
+
+    async deleteHorarioClinica(id: number): Promise<void> {
+        await this.api.delete(`/horarios/clinica/${id}`);
+    }
+
+    // Métodos de franjas horarias
+    async getFranjasHorarias(params?: any): Promise<any[]> {
+        const response = await this.api.get('/horarios/franjas', { params });
+        return response.data;
+    }
+
+    async getFranjaHoraria(id: number): Promise<any> {
+        const response = await this.api.get(`/horarios/franjas/${id}`);
+        return response.data;
+    }
+
+    async createFranjaHoraria(data: any): Promise<any> {
+        const response = await this.api.post('/horarios/franjas', data);
+        return response.data;
+    }
+
+    async updateFranjaHoraria(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/horarios/franjas/${id}`, data);
+        return response.data;
+    }
+
+    async deleteFranjaHoraria(id: number): Promise<void> {
+        await this.api.delete(`/horarios/franjas/${id}`);
+    }
+
+    // Método para obtener usuarios docentes
+    async getDocentes(): Promise<any[]> {
+        const response = await this.api.get('/auth/users?rol=docente');
+        return response.data;
+    }
+
+    // === MÉTODOS DE CITAS ===
+
+    // Obtener todas las citas con filtros opcionales
+    async getCitas(filtros?: FiltrosCitas): Promise<Cita[]> {
+        const params: any = {};
+        if (filtros?.especialidadId) params.especialidadId = filtros.especialidadId;
+        if (filtros?.responsableId) params.responsableId = filtros.responsableId;
+        if (filtros?.pacienteId) params.pacienteId = filtros.pacienteId;
+        if (filtros?.estado) params.estado = filtros.estado;
+        if (filtros?.fechaInicio) params.fechaInicio = filtros.fechaInicio;
+        if (filtros?.fechaFin) params.fechaFin = filtros.fechaFin;
+
+        console.log('API getCitas - Parámetros enviados:', params);
+        const response: AxiosResponse<Cita[]> = await this.api.get('/citas', { params });
+        console.log('API getCitas - Respuesta recibida:', response.data);
+        return response.data;
+    }
+
+    // Obtener una cita específica
+    async getCita(id: number): Promise<Cita> {
+        const response: AxiosResponse<Cita> = await this.api.get(`/citas/${id}`);
+        return response.data;
+    }
+
+    // Crear nueva cita
+    async createCita(data: CrearCitaDto): Promise<Cita> {
+        const response: AxiosResponse<Cita> = await this.api.post('/citas', data);
+        return response.data;
+    }
+
+    // Actualizar cita existente
+    async updateCita(id: number, data: UpdateCitaDto): Promise<Cita> {
+        const response: AxiosResponse<Cita> = await this.api.patch(`/citas/${id}`, data);
+        return response.data;
+    }
+
+    // Eliminar cita
+    async deleteCita(id: number): Promise<void> {
+        await this.api.delete(`/citas/${id}`);
+    }
+
+    // Verificar disponibilidad de una franja horaria
+    async getDisponibilidad(franjaId: number, fecha: string): Promise<DisponibilidadResponse> {
+        const response: AxiosResponse<DisponibilidadResponse> = await this.api.get(`/citas/disponibilidad/${franjaId}?fecha=${fecha}`);
+        return response.data;
+    }
+
+    // Obtener citas de un paciente específico
+    async getCitasPorPaciente(pacienteId: number): Promise<Cita[]> {
+        const response: AxiosResponse<Cita[]> = await this.api.get(`/citas/paciente/${pacienteId}`);
+        return response.data;
+    }
+
+    // Obtener citas de una fecha específica
+    async getCitasPorFecha(fecha: string): Promise<Cita[]> {
+        const response: AxiosResponse<Cita[]> = await this.api.get(`/citas/fecha/${fecha}`);
+        return response.data;
+    }
+
+    // Obtener citas de un responsable
+    async getCitasPorResponsable(responsableId: number, fecha?: string): Promise<Cita[]> {
+        const params = fecha ? { fecha } : {};
+        const response: AxiosResponse<Cita[]> = await this.api.get(`/citas/responsable/${responsableId}`, { params });
+        return response.data;
+    }
+
+    // Obtener citas en un rango de fechas
+    async getCitasRango(fechaInicio: string, fechaFin: string): Promise<Cita[]> {
+        const response: AxiosResponse<Cita[]> = await this.api.get(`/citas/rango?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`);
+        return response.data;
+    }
+
+    // Reagendar una cita
+    async reagendarCita(id: number, data: ReagendarCitaDto): Promise<Cita> {
+        const response: AxiosResponse<Cita> = await this.api.patch(`/citas/${id}/reagendar`, data);
+        return response.data;
+    }
+
+    // Cambiar estado de una cita
+    async cambiarEstadoCita(id: number, data: CambiarEstadoCitaDto): Promise<Cita> {
+        const response: AxiosResponse<Cita> = await this.api.patch(`/citas/${id}/estado`, data);
         return response.data;
     }
 }

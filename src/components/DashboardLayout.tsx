@@ -13,6 +13,7 @@ import {
     HeartIcon,
     ClockIcon,
     AcademicCapIcon,
+    DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 
@@ -30,6 +31,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
         { name: 'Pacientes', href: '/patients', icon: UserGroupIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
         { name: 'Turnos', href: '/appointments', icon: CalendarDaysIcon, roles: ['admin', 'recepcion', 'estudiante', 'docente'] },
+        { name: 'Atenciones', href: '/atenciones', icon: DocumentTextIcon, roles: ['admin', 'estudiante', 'docente'] },
         { name: 'Citas Médicas', href: '/admin/citas', icon: CalendarDaysIcon, roles: ['admin', 'recepcion', 'docente'] },
         { name: 'Usuarios', href: '/users', icon: UsersIcon, roles: ['admin'] },
         { name: 'Especialidades', href: '/admin/especialidades', icon: AcademicCapIcon, roles: ['admin'] },

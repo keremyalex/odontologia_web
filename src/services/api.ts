@@ -350,6 +350,182 @@ class ApiService {
         const response = await this.api.get(`/odontogramas/historia/${historiaId}`);
         return response.data;
     }
+
+    // === MÉTODOS DE ATENCIONES ===
+
+    // Obtener todas las atenciones
+    async getAtenciones(): Promise<any> {
+        try {
+            const response = await this.api.get('/atenciones');
+            console.log('getAtenciones - Respuesta completa:', response);
+            console.log('getAtenciones - Datos:', response.data);
+            console.log('getAtenciones - Es array:', Array.isArray(response.data));
+            
+            return {
+                success: true,
+                data: Array.isArray(response.data) ? response.data : []
+            };
+        } catch (error: any) {
+            console.error('Error al obtener atenciones:', error);
+            console.error('Error response:', error.response);
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Error al cargar atenciones',
+                data: []
+            };
+        }
+    }
+
+    // Obtener atención específica
+    async getAtencion(id: number): Promise<any> {
+        const response = await this.api.get(`/atenciones/${id}`);
+        return response.data;
+    }
+
+    // Crear nueva atención
+    async createAtencion(data: any): Promise<any> {
+        console.log('📤 Enviando datos de atención al backend:', JSON.stringify(data, null, 2));
+        
+        // Transformar los datos para que coincidan con el formato del backend
+        const backendData = {
+            citaId: data.citaId,
+            diagnosticoPresuntivo: data.diagnosticoPresuntivo,
+            planTratamiento: data.planTratamiento,
+            observaciones: data.observaciones,
+            estadoBucalGeneral: {
+                presenciaSarro: data.estadoBucalGeneral.presenciaSarro,
+                enfermedadPeriodontal: data.estadoBucalGeneral.enfermedadPeriodontal,
+                higieneBucal: data.estadoBucalGeneral.higieneBucal,
+                otros: data.estadoBucalGeneral.otros
+            }
+        };
+        
+        console.log('🔄 Datos transformados para el backend:', JSON.stringify(backendData, null, 2));
+        
+        try {
+            const response = await this.api.post('/atenciones', backendData);
+            console.log('✅ Atención creada exitosamente:', response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('❌ Error al crear atención:');
+            console.error('Status:', error.response?.status);
+            console.error('Status Text:', error.response?.statusText);
+            console.error('Error Data:', error.response?.data);
+            console.error('Request Data:', JSON.stringify(backendData, null, 2));
+            
+            // Si hay detalles del error del backend, los mostramos
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            
+            throw error;
+        }
+    }
+
+    // Actualizar atención
+    async updateAtencion(id: number, data: any): Promise<any> {
+        const response = await this.api.patch(`/atenciones/${id}`, data);
+        return response.data;
+    }
+
+    // Eliminar atención
+    async deleteAtencion(id: number): Promise<void> {
+        await this.api.delete(`/atenciones/${id}`);
+    }
+
+    // Obtener atenciones por paciente
+    async getAtencionesPorPaciente(pacienteId: number): Promise<any> {
+        const response = await this.api.get(`/atenciones/paciente/${pacienteId}`);
+        return response.data;
+    }
+
+    // Obtener atenciones por historia clínica
+    async getAtencionesPorHistoria(historiaId: number): Promise<any> {
+        const response = await this.api.get(`/atenciones/historia/${historiaId}`);
+        return response.data;
+    }
+
+    // Obtener atención por cita
+    async getAtencionPorCita(citaId: number): Promise<any> {
+        const response = await this.api.get(`/atenciones/cita/${citaId}`);
+        return response.data;
+    }
+
+    // Obtener mis atenciones (del usuario logueado)
+    async getMisAtenciones(): Promise<any> {
+        const response = await this.api.get('/atenciones/mis-atenciones');
+        return response.data;
+    }
+
+    // Obtener estadísticas de atenciones
+    async getEstadisticasAtenciones(): Promise<any> {
+        const response = await this.api.get('/atenciones/estadisticas');
+        return response.data;
+    }
+
+    // Obtener citas pendientes de atención
+    async getCitasPendientesAtencion(): Promise<any> {
+        try {
+            // Intentar primero con el endpoint específico
+            const response = await this.api.get('/citas/pendientes-atencion');
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (error: any) {
+            // Si falla, usar el endpoint de citas con filtro de estado
+            console.log('Endpoint pendientes-atencion no disponible, usando filtro por estado');
+            try {
+                const response = await this.api.get('/citas', {
+                    params: { estado: 'programada' }
+                });
+                
+                // Mapear los datos al formato esperado por CitaPendienteAtencion
+                const citasMapeadas = response.data.map((cita: any) => ({
+                    ...cita,
+                    paciente: {
+                        ...cita.paciente,
+                        nombres: cita.paciente.nombre || cita.paciente.nombres,
+                        apellidos: cita.paciente.apellido || cita.paciente.apellidos
+                    }
+                }));
+                
+                return {
+                    success: true,
+                    data: citasMapeadas
+                };
+            } catch (fallbackError: any) {
+                // Intentar con estado en mayúsculas
+                try {
+                    const response = await this.api.get('/citas', {
+                        params: { estado: 'PROGRAMADA' }
+                    });
+                    
+                    // Mapear los datos al formato esperado
+                    const citasMapeadas = response.data.map((cita: any) => ({
+                        ...cita,
+                        paciente: {
+                            ...cita.paciente,
+                            nombres: cita.paciente.nombre || cita.paciente.nombres,
+                            apellidos: cita.paciente.apellido || cita.paciente.apellidos
+                        }
+                    }));
+                    
+                    return {
+                        success: true,
+                        data: citasMapeadas
+                    };
+                } catch (finalError: any) {
+                    console.error('Error al obtener citas pendientes:', finalError);
+                    return {
+                        success: false,
+                        error: finalError.response?.data?.message || 'Error al cargar citas pendientes',
+                        data: []
+                    };
+                }
+            }
+        }
+    }
 }
 
 export const apiService = new ApiService();

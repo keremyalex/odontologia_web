@@ -12,6 +12,7 @@ import PatientDetailPage from './pages/PatientDetailPage';
 import CuestionarioPage from './pages/CuestionarioPage';
 import CuestionarioCompletePage from './pages/CuestionarioCompletePage';
 import AppointmentsPage from './pages/AppointmentsPage';
+import AtencionesPage from './pages/AtencionesPage';
 import UsersPage from './pages/UsersPage';
 import UserFormPage from './pages/UserFormPage';
 
@@ -97,6 +98,16 @@ function App() {
               element={
                 <ProtectedRoute requiredRoles={['admin', 'recepcion', 'estudiante', 'docente']}>
                   <AppointmentsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Atenciones routes */}
+            <Route
+              path="/atenciones"
+              element={
+                <ProtectedRoute requiredRoles={['admin', 'estudiante', 'docente']}>
+                  <AtencionesPage />
                 </ProtectedRoute>
               }
             />

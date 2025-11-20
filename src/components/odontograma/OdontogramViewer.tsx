@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './odontogram.css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useOdontograma, type Tooth, type ToothSurface } from '@/hooks/useOdontograma';
 import {
     Save,
     RefreshCw,
@@ -10,94 +11,13 @@ import {
     X
 } from 'lucide-react';
 
-// Tipos para el odontograma personalizado
-interface ToothSurface {
-    vestibular: string;
-    oclusal: string;
-    distal: string;
-    lingual: string;
-    mesial: string;
-}
-
-interface Tooth {
-    id: number;
-    number: string;
-    position: string;
-    group: number;
-    status: string;
-    surfaces: ToothSurface;
-    isTemporary: boolean;
-    observations?: string;
-}
+// Tipos para el odontograma personalizado - ahora importados del hook
 
 interface OdontogramViewerProps {
-    historiaId: string;
+    historiaId: number;  // Cambiar a número para coincidir con API
     readOnly?: boolean;
-    odontograma?: any;
-    onSave?: (data: any) => void;
+    onSave?: (data: any) => void; // Mantener por compatibilidad
 }
-
-// Función para crear dientes iniciales (todos sanos)
-const createInitialTeeth = (): Tooth[] => {
-    const permanentTeeth = [
-        // Grupo 1 - Molares y premolares superiores derechos (1.8 al 1.4)
-        { id: 18, number: '1.8', position: 'Superior Derecho', group: 1 },
-        { id: 17, number: '1.7', position: 'Superior Derecho', group: 1 },
-        { id: 16, number: '1.6', position: 'Superior Derecho', group: 1 },
-        { id: 15, number: '1.5', position: 'Superior Derecho', group: 1 },
-        { id: 14, number: '1.4', position: 'Superior Derecho', group: 1 },
-
-        // Grupo 2 - Incisivos y caninos superiores (1.3 al 2.3)
-        { id: 13, number: '1.3', position: 'Superior Derecho', group: 2 },
-        { id: 12, number: '1.2', position: 'Superior Derecho', group: 2 },
-        { id: 11, number: '1.1', position: 'Superior Derecho', group: 2 },
-        { id: 21, number: '2.1', position: 'Superior Izquierdo', group: 2 },
-        { id: 22, number: '2.2', position: 'Superior Izquierdo', group: 2 },
-        { id: 23, number: '2.3', position: 'Superior Izquierdo', group: 2 },
-
-        // Grupo 3 - Premolares y molares superiores izquierdos (2.4 al 2.8)
-        { id: 24, number: '2.4', position: 'Superior Izquierdo', group: 3 },
-        { id: 25, number: '2.5', position: 'Superior Izquierdo', group: 3 },
-        { id: 26, number: '2.6', position: 'Superior Izquierdo', group: 3 },
-        { id: 27, number: '2.7', position: 'Superior Izquierdo', group: 3 },
-        { id: 28, number: '2.8', position: 'Superior Izquierdo', group: 3 },
-
-        // Grupo 4 - Molares y premolares inferiores derechos (4.8 al 4.4)
-        { id: 48, number: '4.8', position: 'Inferior Derecho', group: 4 },
-        { id: 47, number: '4.7', position: 'Inferior Derecho', group: 4 },
-        { id: 46, number: '4.6', position: 'Inferior Derecho', group: 4 },
-        { id: 45, number: '4.5', position: 'Inferior Derecho', group: 4 },
-        { id: 44, number: '4.4', position: 'Inferior Derecho', group: 4 },
-
-        // Grupo 5 - Incisivos y caninos inferiores (4.3 al 3.3)
-        { id: 43, number: '4.3', position: 'Inferior Derecho', group: 5 },
-        { id: 42, number: '4.2', position: 'Inferior Derecho', group: 5 },
-        { id: 41, number: '4.1', position: 'Inferior Derecho', group: 5 },
-        { id: 31, number: '3.1', position: 'Inferior Izquierdo', group: 5 },
-        { id: 32, number: '3.2', position: 'Inferior Izquierdo', group: 5 },
-        { id: 33, number: '3.3', position: 'Inferior Izquierdo', group: 5 },
-
-        // Grupo 6 - Premolares y molares inferiores izquierdos (3.4 al 3.8)
-        { id: 34, number: '3.4', position: 'Inferior Izquierdo', group: 6 },
-        { id: 35, number: '3.5', position: 'Inferior Izquierdo', group: 6 },
-        { id: 36, number: '3.6', position: 'Inferior Izquierdo', group: 6 },
-        { id: 37, number: '3.7', position: 'Inferior Izquierdo', group: 6 },
-        { id: 38, number: '3.8', position: 'Inferior Izquierdo', group: 6 }
-    ];
-
-    return permanentTeeth.map(tooth => ({
-        ...tooth,
-        status: 'sano',
-        isTemporary: false,
-        surfaces: {
-            vestibular: 'sano',
-            oclusal: 'sano',
-            distal: 'sano',
-            lingual: 'sano',
-            mesial: 'sano'
-        }
-    }));
-};
 
 // Herramientas disponibles para el odontograma
 const toothTools = [
@@ -625,29 +545,22 @@ const CustomOdontogram: React.FC<{
 const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
     historiaId,
     readOnly = false,
-    odontograma,
     onSave
 }) => {
-    // Estados del odontograma personalizado
-    const [teeth, setTeeth] = useState<Tooth[]>(createInitialTeeth());
+    // Usar el hook del odontograma
+    const {
+        teeth,
+        loading: isLoading,
+        hasChanges,
+        saveOdontograma,
+        updateTooth,
+        updateSurface,
+        resetToInitial
+    } = useOdontograma(historiaId);
+
+    // Estados locales para la UI
     const [selectedTooth, setSelectedTooth] = useState<Tooth | null>(null);
     const [currentTool] = useState('sano');
-    const [hasChanges, setHasChanges] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Cargar datos del odontograma al montar el componente
-    useEffect(() => {
-        if (odontograma?.dientes) {
-            try {
-                const loadedTeeth = typeof odontograma.dientes === 'string'
-                    ? JSON.parse(odontograma.dientes)
-                    : odontograma.dientes;
-                setTeeth(loadedTeeth);
-            } catch (error) {
-                console.error('Error al cargar odontograma:', error);
-            }
-        }
-    }, [odontograma]);
 
     // Manejar click en diente
     const handleToothClick = (tooth: Tooth) => {
@@ -656,54 +569,27 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
             return;
         }
 
-        const updatedTeeth = teeth.map(t =>
-            t.id === tooth.id
-                ? { ...t, status: currentTool }
-                : t
-        );
-
-        setTeeth(updatedTeeth);
+        updateTooth(tooth.id, { status: currentTool });
         setSelectedTooth({ ...tooth, status: currentTool });
-        setHasChanges(true);
     };
 
     // Manejar actualización de diente desde el panel lateral
     const handleToothUpdate = (toothId: number, updates: Partial<Tooth>) => {
         if (readOnly) return;
 
-        const updatedTeeth = teeth.map(t =>
-            t.id === toothId
-                ? { ...t, ...updates }
-                : t
-        );
-
-        setTeeth(updatedTeeth);
+        updateTooth(toothId, updates);
 
         // Actualizar el diente seleccionado si es el mismo
         if (selectedTooth && selectedTooth.id === toothId) {
             setSelectedTooth({ ...selectedTooth, ...updates });
         }
-
-        setHasChanges(true);
     };
 
     // Manejar actualización de superficie desde el panel lateral
     const handleSurfaceUpdate = (toothId: number, surface: keyof ToothSurface, status: string) => {
         if (readOnly) return;
 
-        const updatedTeeth = teeth.map(t =>
-            t.id === toothId
-                ? {
-                    ...t,
-                    surfaces: {
-                        ...t.surfaces,
-                        [surface]: status
-                    }
-                }
-                : t
-        );
-
-        setTeeth(updatedTeeth);
+        updateSurface(toothId, surface, status);
 
         // Actualizar el diente seleccionado si es el mismo
         if (selectedTooth && selectedTooth.id === toothId) {
@@ -715,37 +601,27 @@ const OdontogramViewer: React.FC<OdontogramViewerProps> = ({
                 }
             });
         }
-
-        setHasChanges(true);
     };
 
-    // Guardar odontograma
+    // Guardar odontograma usando el hook
     const handleSave = async () => {
-        if (!onSave || isLoading) return;
+        if (isLoading) return;
 
-        setIsLoading(true);
-        try {
-            const odontogramData = {
-                historiaClinicaId: historiaId,
-                dientes: JSON.stringify(teeth),
-                fechaModificacion: new Date().toISOString(),
-                observaciones: ''
-            };
-
-            await onSave(odontogramData);
-            setHasChanges(false);
-        } catch (error) {
-            console.error('Error al guardar odontograma:', error);
-        } finally {
-            setIsLoading(false);
+        const success = await saveOdontograma('Odontograma actualizado');
+        
+        // Llamar onSave si existe (para compatibilidad)
+        if (success && onSave) {
+            await onSave({
+                dientes: teeth,
+                observaciones: 'Odontograma actualizado'
+            });
         }
     };
 
     // Resetear a estado inicial
     const handleReset = () => {
-        setTeeth(createInitialTeeth());
+        resetToInitial();
         setSelectedTooth(null);
-        setHasChanges(true);
     };
 
     return (

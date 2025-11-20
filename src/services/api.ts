@@ -324,6 +324,32 @@ class ApiService {
         const response: AxiosResponse<Cita> = await this.api.patch(`/citas/${id}/estado`, data);
         return response.data;
     }
+
+    // === MÉTODOS DE ODONTOGRAMA ===
+
+    // Obtener odontograma de una historia clínica
+    async getOdontograma(historiaId: number): Promise<any> {
+        const response = await this.api.get(`/odontogramas/historia/${historiaId}/latest`);
+        return response.data;
+    }
+
+    // Guardar/actualizar odontograma
+    async saveOdontograma(historiaId: number, data: { dientes: any[], observaciones?: string }): Promise<any> {
+        const response = await this.api.post(`/odontogramas/historia/${historiaId}/guardar`, data);
+        return response.data;
+    }
+
+    // Obtener estadísticas del odontograma
+    async getOdontogramaEstadisticas(historiaId: number): Promise<any> {
+        const response = await this.api.get(`/odontogramas/historia/${historiaId}/estadisticas`);
+        return response.data;
+    }
+
+    // Obtener historial de versiones del odontograma
+    async getOdontogramaHistorial(historiaId: number): Promise<any> {
+        const response = await this.api.get(`/odontogramas/historia/${historiaId}`);
+        return response.data;
+    }
 }
 
 export const apiService = new ApiService();

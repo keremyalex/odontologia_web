@@ -1,0 +1,127 @@
+/* Personalización del Chat Widget para Clínica Odontológica UAGRM */
+
+:root {
+  /* Colores principales del sistema odontológico */
+  --chat--color--primary: #3b82f6; /* Azul institucional */
+  --chat--color--primary-shade-50: #2563eb;
+  --chat--color--primary--shade-100: #1d4ed8;
+  --chat--color--secondary: #10b981; /* Verde salud */
+  --chat--color-secondary-shade-50: #059669;
+  
+  /* Colores de fondo */
+  --chat--color-white: #ffffff;
+  --chat--color-light: #f8fafc;
+  --chat--color-light-shade-50: #f1f5f9;
+  --chat--color-light-shade-100: #e2e8f0;
+  --chat--color-medium: #cbd5e1;
+  --chat--color-dark: #1e293b;
+  --chat--color-disabled: #6b7280;
+  --chat--color-typing: #4b5563;
+
+  /* Espaciado y formas */
+  --chat--spacing: 1rem;
+  --chat--border-radius: 0.5rem;
+  --chat--transition-duration: 0.2s;
+
+  /* Dimensiones de la ventana */
+  --chat--window--width: 420px;
+  --chat--window--height: 650px;
+
+  /* Header personalizado */
+  --chat--header-height: auto;
+  --chat--header--padding: 1.5rem 1rem;
+  --chat--header--background: linear-gradient(135deg, var(--chat--color--primary) 0%, var(--chat--color--primary-shade-50) 100%);
+  --chat--header--color: var(--chat--color-white);
+  --chat--header--border-top: none;
+  --chat--header--border-bottom: none;
+  --chat--heading--font-size: 1.25rem;
+  --chat--subtitle--font-size: 0.9rem;
+  --chat--subtitle--line-height: 1.6;
+
+  /* Área de texto */
+  --chat--textarea--height: 60px;
+  
+  /* Mensajes */
+  --chat--message--font-size: 0.95rem;
+  --chat--message--padding: 0.75rem 1rem;
+  --chat--message--border-radius: 1rem;
+  --chat--message-line-height: 1.6;
+  
+  /* Mensajes del bot */
+  --chat--message--bot--background: #f8fafc;
+  --chat--message--bot--color: var(--chat--color-dark);
+  --chat--message--bot--border: 1px solid #e2e8f0;
+  
+  /* Mensajes del usuario */
+  --chat--message--user--background: var(--chat--color--primary);
+  --chat--message--user--color: var(--chat--color-white);
+  --chat--message--user--border: none;
+  
+  /* Código en mensajes */
+  --chat--message--pre--background: rgba(59, 130, 246, 0.1);
+
+  /* Botón toggle */
+  --chat--toggle--background: var(--chat--color--primary);
+  --chat--toggle--hover--background: var(--chat--color--primary-shade-50);
+  --chat--toggle--active--background: var(--chat--color--primary--shade-100);
+  --chat--toggle--color: var(--chat--color-white);
+  --chat--toggle--size: 70px;
+}
+
+/* Mejoras adicionales para el sistema odontológico */
+.n8n-chat {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Sombra personalizada para el widget */
+.n8n-chat-window {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+/* Animación suave al abrir */
+.n8n-chat-window.opening {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilo para el scroll en modo fullscreen */
+.n8n-chat-fullscreen {
+  scrollbar-width: thin;
+  scrollbar-color: var(--chat--color--primary) transparent;
+}
+
+.n8n-chat-fullscreen::-webkit-scrollbar {
+  width: 6px;
+}
+
+.n8n-chat-fullscreen::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.n8n-chat-fullscreen::-webkit-scrollbar-thumb {
+  background-color: var(--chat--color--primary);
+  border-radius: 3px;
+}
+
+.n8n-chat-fullscreen::-webkit-scrollbar-thumb:hover {
+  background-color: var(--chat--color--primary-shade-50);
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  :root {
+    --chat--window--width: calc(100vw - 2rem);
+    --chat--window--height: calc(100vh - 4rem);
+  }
+}

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import UagrmChat from './UagrmChat';
+import './chat-styles.css';
 import {
     HomeIcon,
     UserGroupIcon,
@@ -190,6 +192,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     </div>
                 </main>
             </div>
+            
+            {/* Chat Widget - Solo dentro del sistema */}
+            <UagrmChat 
+                webhookUrl={import.meta.env.VITE_N8N_WEBHOOK_URL || ''}
+                mode="window"
+                showWelcomeScreen={true}
+                enableStreaming={false}
+                initialMessages={[
+                    '¡Hola! 👨‍⚕️',
+                    'Soy el asistente de la Clínica Odontológica UAGRM.',
+                    'Puedo ayudarte con información sobre horarios, especialidades, citas y más.',
+                    '¿En qué puedo asistirte hoy?'
+                ]}
+            />
         </div>
     );
 };

@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import UagrmChat from './components/UagrmChat';
 import './components/chat-styles.css';
 
 // Pages
@@ -199,20 +198,6 @@ function App() {
             {/* Redirect to dashboard for authenticated users */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          
-          {/* Chat Widget - Disponible en todas las páginas del sistema */}
-          <UagrmChat 
-            webhookUrl={import.meta.env.VITE_N8N_WEBHOOK_URL || ''}
-            mode="window"
-            showWelcomeScreen={true}
-            enableStreaming={false}
-            initialMessages={[
-              '¡Hola! 👨‍⚕️',
-              'Soy el asistente de la Clínica Odontológica UAGRM.',
-              'Puedo ayudarte con información sobre horarios, especialidades, citas y más.',
-              '¿En qué puedo asistirte hoy?'
-            ]}
-          />
         </div>
       </Router>
     </AuthProvider>
